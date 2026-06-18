@@ -11,15 +11,69 @@ const { screenshots, title } = Astro.props;
 
 {
   screenshots.length > 0 && (
-    <div class="gallery">
-      {screenshots.map((src, i) => (
-        <a class="shot" href={withBase(src)} target="_blank" rel="noopener">
-          <img src={withBase(src)} alt={`${title} screenshot ${i + 1}`} loading="lazy" />
-        </a>
-      ))}
+    <div class="gallery-wrap" data-gallery>
+      <div class="gallery">
+        {screenshots.map((src, i) => (
+          <button class="shot" type="button" data-shot data-src={withBase(src)} aria-label={`Open screenshot ${i + 1}`}>
+            <img src={withBase(src)} alt={`${title} screenshot ${i + 1}`} loading="lazy" />
+          </button>
+        ))}
+      </div>
+
+      <div class="lightbox" data-lightbox hidden>
+        <button class="lb-btn lb-close" data-lb-close aria-label="Close (Esc)">×</button>
+        <button class="lb-btn lb-prev" data-lb-prev aria-label="Previous">‹</button>
+        <img class="lb-img" data-lb-img src="" alt="" />
+        <button class="lb-btn lb-next" data-lb-next aria-label="Next">›</button>
+      </div>
     </div>
   )
 }
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((wrap) => {
+    const lb = wrap.querySelector<HTMLElement>('[data-lightbox]');
+    const img = wrap.querySelector<HTMLImageElement>('[data-lb-img]');
+    const shots = Array.from(wrap.querySelectorAll<HTMLElement>('[data-shot]'));
+    if (!lb || !img || shots.length === 0) return;
+
+    let current = 0;
+
+    const open = (i: number) => {
+      current = (i + shots.length) % shots.length;
+      const btn = shots[current];
+      img.src = btn.dataset.src || '';
+      img.alt = btn.querySelector('img')?.alt || '';
+      lb.hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+    const close = () => {
+      lb.hidden = true;
+      document.body.style.overflow = '';
+    };
+
+    shots.forEach((b, i) => b.addEventListener('click', () => open(i)));
+    lb.querySelector('[data-lb-close]')?.addEventListener('click', close);
+    lb.querySelector('[data-lb-prev]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      open(current - 1);
+    });
+    lb.querySelector('[data-lb-next]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      open(current + 1);
+    });
+    // Click on the dark backdrop (not the image/buttons) closes.
+    lb.addEventListener('click', (e) => {
+      if (e.target === lb) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') open(current - 1);
+      else if (e.key === 'ArrowRight') open(current + 1);
+    });
+  });
+</script>
 
 <style>
   .gallery {
@@ -29,10 +83,12 @@ const { screenshots, title } = Astro.props;
   }
   .shot {
     display: block;
+    padding: 0;
     border: 1px solid var(--border);
     border-radius: 10px;
     overflow: hidden;
     background: var(--bg-soft);
+    cursor: zoom-in;
     transition: border-color 0.15s ease;
   }
   .shot:hover {
@@ -44,5 +100,68 @@ const { screenshots, title } = Astro.props;
     height: 100%;
     object-fit: cover;
     aspect-ratio: 16 / 10;
+  }
+
+  /* Lightbox overlay */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.86);
+    backdrop-filter: blur(2px);
+  }
+  .lightbox[hidden] {
+    display: none;
+  }
+  .lb-img {
+    max-width: 92vw;
+    max-height: 86vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+  }
+  .lb-btn {
+    position: absolute;
+    background: rgba(20, 24, 34, 0.7);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .lb-btn:hover {
+    background: var(--card-hover);
+    border-color: var(--accent);
+  }
+  .lb-close {
+    top: 1rem;
+    right: 1.2rem;
+    width: 42px;
+    height: 42px;
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+  .lb-prev,
+  .lb-next {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+  .lb-prev {
+    left: 1.2rem;
+  }
+  .lb-next {
+    right: 1.2rem;
   }
 </style>
