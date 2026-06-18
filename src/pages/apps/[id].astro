@@ -98,6 +98,42 @@ const hasGuides = guides.length > 0 || !!data.repo;
       </section>
     )
   }
+
+  <script>
+    // Turn each long-description (.prose) h3 into a collapsible accordion section:
+    // click (or Enter/Space) the heading to toggle the content beneath it.
+    document.querySelectorAll('.prose h3').forEach((h) => {
+      const heading = h as HTMLElement;
+      const body = document.createElement('div');
+      body.className = 'collapse-body';
+      // Move every sibling up to the next h2/h3 into the collapsible body.
+      let el = heading.nextElementSibling;
+      while (el && el.tagName !== 'H3' && el.tagName !== 'H2') {
+        const next = el.nextElementSibling;
+        body.appendChild(el);
+        el = next;
+      }
+      heading.after(body);
+      heading.classList.add('collapsible');
+      heading.setAttribute('role', 'button');
+      heading.setAttribute('tabindex', '0');
+      heading.setAttribute('aria-expanded', 'false');
+      body.hidden = true; // default collapsed
+
+      const toggle = () => {
+        const wasHidden = body.hidden;
+        body.hidden = !wasHidden;
+        heading.setAttribute('aria-expanded', String(wasHidden));
+      };
+      heading.addEventListener('click', toggle);
+      heading.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle();
+        }
+      });
+    });
+  </script>
 </Base>
 
 <style>
@@ -180,5 +216,31 @@ const hasGuides = guides.length > 0 || !!data.repo;
     padding: 0.1rem 0.35rem;
     border-radius: 5px;
     font-size: 0.88em;
+  }
+
+  /* Collapsible h3 sections (toggled by the script above) */
+  .prose :global(h3.collapsible) {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.15s ease;
+  }
+  .prose :global(h3.collapsible:hover) {
+    color: var(--accent);
+  }
+  .prose :global(h3.collapsible)::before {
+    content: '▸';
+    font-size: 0.75em;
+    color: var(--accent);
+    display: inline-block;
+    transition: transform 0.15s ease;
+  }
+  .prose :global(h3.collapsible[aria-expanded='true'])::before {
+    transform: rotate(90deg);
+  }
+  .prose :global(.collapse-body[hidden]) {
+    display: none;
   }
 </style>
