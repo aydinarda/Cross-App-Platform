@@ -4,6 +4,7 @@ tagline: Demand & scenario simulation desktop app
 description: A Streamlit-based, packaged desktop simulation/optimization application.
 category: Simulation / Optimization
 status: live
+draft: true # hidden for now — flip to false (or remove) to publish
 order: 2
 accent: '#34d399'
 repo: https://github.com/TNE-CASE/TGE_CASE-web-page

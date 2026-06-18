@@ -10,7 +10,7 @@ import { withBase } from '../../lib/url';
 import { getLogo, getScreenshots } from '../../lib/media';
 
 export const getStaticPaths = (async () => {
-  const apps = await getCollection('apps');
+  const apps = (await getCollection('apps')).filter((app) => !app.data.draft); // hide drafts
   return apps.map((app) => ({ params: { id: app.id }, props: { app } }));
 }) satisfies GetStaticPaths;
 

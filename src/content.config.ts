@@ -24,6 +24,7 @@ const apps = defineCollection({
     description: z.string().optional(), // short text shown on the card
     category: z.string().optional(),
     status: z.enum(['live', 'beta', 'wip']).default('live'),
+    draft: z.boolean().default(false), // true = hidden everywhere (no card, no detail page)
     featured: z.boolean().default(false),
     order: z.number().default(999), // home page ordering (smaller = first)
     accent: z.string().optional(), // card accent color, e.g. "#3b82f6"

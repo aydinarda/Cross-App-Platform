@@ -4,10 +4,12 @@ import Base from '../layouts/Base.astro';
 import AppCard from '../components/AppCard.astro';
 import { getLogo } from '../lib/media';
 
-const apps = (await getCollection('apps')).sort((a, b) => {
-  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
-  return a.data.order - b.data.order;
-});
+const apps = (await getCollection('apps'))
+  .filter((a) => !a.data.draft) // hide drafts
+  .sort((a, b) => {
+    if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+    return a.data.order - b.data.order;
+  });
 
 // Join the downloads table → which platforms each app offers (for the card chips).
 const downloads = await getCollection('downloads');

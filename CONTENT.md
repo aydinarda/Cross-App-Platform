@@ -26,6 +26,7 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 
 > Base info. `status`: live | beta | wip · `featured`: true|false · `order`: smaller = first · `accent`: hex color.
 > (No logo column — the logo is auto-loaded from `public/apps/<id>/logo.png`.)
+> To **hide** an app, add `draft: true` to its `src/content/apps/<id>.md` frontmatter (no card, no page). Currently: `tne-case` is hidden.
 
 | id | title | tagline | description | category | status | featured | order | accent | repo |
 |----|-------|---------|-------------|----------|--------|----------|-------|--------|------|
