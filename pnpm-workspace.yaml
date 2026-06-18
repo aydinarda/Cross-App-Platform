@@ -1,0 +1,5 @@
+# Allow these dependencies to run their install/build scripts.
+# esbuild & sharp are pulled in by Astro/Vite and need their native binaries.
+allowBuilds:
+  esbuild: true
+  sharp: true

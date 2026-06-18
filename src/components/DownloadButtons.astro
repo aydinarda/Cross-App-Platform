@@ -1,0 +1,79 @@
+---
+// One row per app+platform, coming from the `downloads` collection.
+interface Download {
+  platform: 'web' | 'macos' | 'windows' | 'linux';
+  url: string;
+  version?: string;
+  size?: string;
+  note?: string;
+}
+
+interface Props {
+  downloads: Download[];
+}
+
+const { downloads } = Astro.props;
+
+const meta: Record<Download['platform'], { icon: string; label: string; primary?: boolean }> = {
+  web: { icon: '▶', label: 'Play in Browser', primary: true },
+  macos: { icon: '', label: 'Download for macOS' },
+  windows: { icon: '⊞', label: 'Download for Windows' },
+  linux: { icon: '🐧', label: 'Download for Linux' },
+};
+
+// Stable order: web first, then desktop targets.
+const sortOrder = ['web', 'macos', 'windows', 'linux'];
+const rows = [...downloads].sort(
+  (a, b) => sortOrder.indexOf(a.platform) - sortOrder.indexOf(b.platform)
+);
+---
+
+{
+  rows.length > 0 && (
+    <div class="downloads">
+      {rows.map((d) => {
+        const m = meta[d.platform];
+        const sub = [d.version && `v${d.version}`, d.note, d.size].filter(Boolean).join(' · ');
+        return (
+          <a
+            class={`btn ${m.primary ? 'btn-primary' : ''} dl`}
+            href={d.url}
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="dl-icon">{m.icon}</span>
+            <span class="dl-text">
+              <span class="dl-label">{m.label}</span>
+              {sub && <span class="dl-sub">{sub}</span>}
+            </span>
+          </a>
+        );
+      })}
+    </div>
+  )
+}
+
+<style>
+  .downloads {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+  .dl {
+    align-items: center;
+  }
+  .dl-icon {
+    font-size: 1.05rem;
+  }
+  .dl-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    text-align: left;
+  }
+  .dl-sub {
+    font-size: 0.72rem;
+    font-weight: 500;
+    opacity: 0.75;
+  }
+</style>

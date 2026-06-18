@@ -1,0 +1,98 @@
+---
+// Rows from the `stats` collection for one app.
+interface Stat {
+  label: string;
+  value?: string | number;
+  icon?: string;
+  source: 'static' | 'live';
+  url?: string;
+  field?: string;
+  suffix?: string;
+}
+
+interface Props {
+  stats: Stat[];
+}
+
+const { stats } = Astro.props;
+---
+
+{
+  stats.length > 0 && (
+    <div class="stats">
+      {stats.map((s) => (
+        <div class="stat">
+          {s.icon && <span class="stat-icon">{s.icon}</span>}
+          <span
+            class="stat-value"
+            data-stat-url={s.source === 'live' ? s.url : undefined}
+            data-stat-field={s.source === 'live' ? s.field : undefined}
+          >
+            {s.value ?? '—'}
+            {s.suffix && <span class="stat-suffix">{s.suffix}</span>}
+          </span>
+          <span class="stat-label">{s.label}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+{/* Live stats: fetch each endpoint client-side and update the value (needs a public CORS endpoint). */}
+<script is:inline>
+  (() => {
+    const get = (obj, path) => path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+    document.querySelectorAll('[data-stat-url]').forEach(async (el) => {
+      const url = el.getAttribute('data-stat-url');
+      const field = el.getAttribute('data-stat-field');
+      if (!url) return;
+      try {
+        const res = await fetch(url, { headers: { accept: 'application/json' } });
+        if (!res.ok) return;
+        const data = await res.json();
+        const val = field ? get(data, field) : data;
+        if (val == null) return;
+        const suffix = el.querySelector('.stat-suffix');
+        el.textContent = String(val);
+        if (suffix) el.appendChild(suffix);
+      } catch {
+        /* keep the static fallback value */
+      }
+    });
+  })();
+</script>
+
+<style>
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.8rem;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.9rem 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .stat-icon {
+    font-size: 1.1rem;
+  }
+  .stat-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .stat-suffix {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-left: 0.2rem;
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+</style>

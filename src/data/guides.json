@@ -1,0 +1,16 @@
+[
+  {
+    "id": "newsvendor-admin",
+    "app": "newsvendor",
+    "type": "admin",
+    "label": "Admin Guide (.docx)",
+    "url": "/apps/newsvendor/guides/admin-guide.docx"
+  },
+  {
+    "id": "tne-case-build",
+    "app": "tne-case",
+    "type": "build",
+    "label": "Build Guide (README_BUILD)",
+    "url": "https://github.com/TNE-CASE/TGE_CASE-web-page/blob/main/README_BUILD.md"
+  }
+]

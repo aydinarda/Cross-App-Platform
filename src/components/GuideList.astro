@@ -1,0 +1,78 @@
+---
+import { withBase } from '../lib/url';
+
+interface Guide {
+  type: 'admin' | 'user' | 'build' | 'other';
+  label: string;
+  url: string;
+}
+
+interface Props {
+  guides: Guide[];
+  repo?: string;
+}
+
+const { guides, repo } = Astro.props;
+
+const typeIcon: Record<string, string> = {
+  admin: '🛠️',
+  user: '📘',
+  build: '⚙️',
+  other: '📄',
+};
+
+const links = [
+  ...guides.map((g) => ({ icon: typeIcon[g.type] ?? '📄', label: g.label, href: withBase(g.url) })),
+  ...(repo ? [{ icon: '🔗', label: 'Source code (repo)', href: repo }] : []),
+];
+---
+
+{
+  links.length > 0 && (
+    <ul class="guides">
+      {links.map((l) => (
+        <li>
+          <a href={l.href} target="_blank" rel="noopener">
+            <span class="g-icon">{l.icon}</span>
+            <span>{l.label}</span>
+            <span class="g-arrow">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .guides {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .guides a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease;
+  }
+  .guides a:hover {
+    border-color: var(--accent);
+    background: var(--card-hover);
+  }
+  .g-icon {
+    font-size: 1.05rem;
+  }
+  .g-arrow {
+    margin-left: auto;
+    color: var(--text-dim);
+  }
+</style>

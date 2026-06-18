@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import AppCard from '../components/AppCard.astro';
+
+const apps = (await getCollection('apps')).sort((a, b) => {
+  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+  return a.data.order - b.data.order;
+});
+
+// Join the downloads table → which platforms each app offers (for the card chips).
+const downloads = await getCollection('downloads');
+const platformsByApp = new Map<string, string[]>();
+for (const d of downloads) {
+  const key = d.data.app.id;
+  platformsByApp.set(key, [...(platformsByApp.get(key) ?? []), d.data.platform]);
+}
+
+// Join the visuals table → the card logo (first logo/icon row per app).
+const visuals = await getCollection('visuals');
+const logoByApp = new Map<string, string>();
+for (const v of visuals) {
+  if ((v.data.kind === 'logo' || v.data.kind === 'icon') && !logoByApp.has(v.data.app.id)) {
+    logoByApp.set(v.data.app.id, v.data.file);
+  }
+}
+---
+
+<Base title="App Hub — Apps">
+  <section class="hero">
+    <h1>App Hub</h1>
+    <p>A single showcase for indie games and apps. Download, play, and find the guides.</p>
+  </section>
+
+  <section class="grid">
+    {
+      apps.map((app) => (
+        <AppCard
+          app={app}
+          platforms={platformsByApp.get(app.id) ?? []}
+          logo={logoByApp.get(app.id)}
+        />
+      ))
+    }
+  </section>
+
+  {
+    apps.length === 0 && (
+      <p class="empty">
+        No apps yet. Add a manifest under <code>src/content/apps/</code>.
+      </p>
+    )
+  }
+</Base>
+
+<style>
+  .hero {
+    text-align: center;
+    margin: 1rem 0 2.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin: 0 0 0.5rem;
+    background: linear-gradient(120deg, #e6e9ef, #5b8cff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p {
+    color: var(--text-dim);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.1rem;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--text-dim);
+  }
+</style>

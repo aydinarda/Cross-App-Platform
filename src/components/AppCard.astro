@@ -1,0 +1,132 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { withBase } from '../lib/url';
+
+interface Props {
+  app: CollectionEntry<'apps'>;
+  platforms?: string[]; // platform keys present in the downloads table for this app
+  logo?: string; // logo/icon path from the visuals table
+}
+
+const { app, platforms = [], logo } = Astro.props;
+const { data } = app;
+
+const platformLabels: Record<string, string> = {
+  web: 'Web',
+  macos: 'macOS',
+  windows: 'Windows',
+  linux: 'Linux',
+};
+const available = [...new Set(platforms)];
+---
+
+<a class="card" href={withBase(`/apps/${app.id}`)} style={data.accent ? `--card-accent:${data.accent}` : ''}>
+  <div class="card-top">
+    {
+      logo ? (
+        <img class="card-logo" src={withBase(logo)} alt={`${data.title} logo`} loading="lazy" />
+      ) : (
+        <div class="card-logo card-logo--placeholder">{data.title.charAt(0)}</div>
+      )
+    }
+    <span class={`badge badge-${data.status}`}>{data.status}</span>
+  </div>
+
+  <h3 class="card-title">{data.title}</h3>
+  {data.tagline && <p class="card-tagline">{data.tagline}</p>}
+  {data.description && <p class="card-desc">{data.description}</p>}
+
+  <div class="card-meta">
+    {data.category && <span class="card-cat">{data.category}</span>}
+    <span class="card-platforms">
+      {available.map((p) => <span class="chip">{platformLabels[p] ?? p}</span>)}
+    </span>
+  </div>
+</a>
+
+<style>
+  .card {
+    --card-accent: var(--accent);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    transition:
+      transform 0.12s ease,
+      border-color 0.15s ease,
+      background 0.15s ease;
+    height: 100%;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: var(--card-accent);
+    background: var(--card-hover);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .card-logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+  }
+  .card-logo--placeholder {
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--card-accent);
+  }
+
+  .card-title {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+  .card-tagline {
+    margin: 0;
+    color: var(--text);
+    font-size: 0.92rem;
+  }
+  .card-desc {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.86rem;
+  }
+
+  .card-meta {
+    margin-top: auto;
+    padding-top: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .card-cat {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+  .card-platforms {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+  .chip {
+    font-size: 0.72rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 6px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+</style>

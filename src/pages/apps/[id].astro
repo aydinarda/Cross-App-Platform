@@ -1,0 +1,184 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import DownloadButtons from '../../components/DownloadButtons.astro';
+import GuideList from '../../components/GuideList.astro';
+import ScreenshotGallery from '../../components/ScreenshotGallery.astro';
+import Stats from '../../components/Stats.astro';
+import { withBase } from '../../lib/url';
+
+export const getStaticPaths = (async () => {
+  const apps = await getCollection('apps');
+  return apps.map((app) => ({ params: { id: app.id }, props: { app } }));
+}) satisfies GetStaticPaths;
+
+const { app } = Astro.props;
+const { data } = app;
+const { Content } = await render(app);
+
+// Join the related tables to this app via the `app` reference (foreign key).
+const downloads = (await getCollection('downloads'))
+  .filter((d) => d.data.app.id === app.id)
+  .map((d) => d.data);
+const guides = (await getCollection('guides'))
+  .filter((g) => g.data.app.id === app.id)
+  .map((g) => g.data);
+const appVisuals = (await getCollection('visuals')).filter((v) => v.data.app.id === app.id);
+const stats = (await getCollection('stats'))
+  .filter((s) => s.data.app.id === app.id)
+  .map((s) => s.data);
+
+const logo = appVisuals.find((v) => v.data.kind === 'logo' || v.data.kind === 'icon')?.data.file;
+const screenshots = appVisuals
+  .filter((v) => v.data.kind === 'screenshot' || v.data.kind === 'background')
+  .map((v) => v.data.file);
+
+const hasDownloads = downloads.length > 0;
+const hasGuides = guides.length > 0 || !!data.repo;
+---
+
+<Base title={`${data.title} — App Hub`} description={data.tagline ?? data.description}>
+  <a class="back" href={withBase('/')}>← All apps</a>
+
+  <header class="app-head">
+    {
+      logo ? (
+        <img class="head-logo" src={withBase(logo)} alt={`${data.title} logo`} />
+      ) : (
+        <div class="head-logo head-logo--ph">{data.title.charAt(0)}</div>
+      )
+    }
+    <div class="head-text">
+      <div class="head-row">
+        <h1>{data.title}</h1>
+        <span class={`badge badge-${data.status}`}>{data.status}</span>
+      </div>
+      {data.tagline && <p class="head-tag">{data.tagline}</p>}
+      {data.category && <span class="head-cat">{data.category}</span>}
+    </div>
+  </header>
+
+  {
+    hasDownloads && (
+      <section class="block">
+        <h2>Download / Play</h2>
+        <DownloadButtons downloads={downloads} />
+      </section>
+    )
+  }
+
+  {
+    stats.length > 0 && (
+      <section class="block">
+        <h2>Stats</h2>
+        <Stats stats={stats} />
+      </section>
+    )
+  }
+
+  <section class="block prose">
+    <Content />
+  </section>
+
+  {
+    screenshots.length > 0 && (
+      <section class="block">
+        <h2>Screenshots</h2>
+        <ScreenshotGallery screenshots={screenshots} title={data.title} />
+      </section>
+    )
+  }
+
+  {
+    hasGuides && (
+      <section class="block">
+        <h2>Guides &amp; Resources</h2>
+        <GuideList guides={guides} repo={data.repo} />
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  .back {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+  .back:hover {
+    color: var(--text);
+  }
+
+  .app-head {
+    display: flex;
+    gap: 1.1rem;
+    align-items: center;
+    margin: 1.2rem 0 2rem;
+  }
+  .head-logo {
+    width: 84px;
+    height: 84px;
+    border-radius: 18px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    flex-shrink: 0;
+  }
+  .head-logo--ph {
+    display: grid;
+    place-items: center;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .head-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+  }
+  .head-row h1 {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  .head-tag {
+    margin: 0.3rem 0 0.4rem;
+    color: var(--text);
+  }
+  .head-cat {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .block {
+    margin: 2rem 0;
+  }
+  .block h2 {
+    font-size: 1.1rem;
+    margin: 0 0 0.9rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .prose :global(p) {
+    color: var(--text-dim);
+  }
+  .prose :global(h2),
+  .prose :global(h3) {
+    color: var(--text);
+    border: none;
+  }
+  .prose :global(ul) {
+    color: var(--text-dim);
+  }
+  .prose :global(a) {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  .prose :global(code) {
+    background: var(--bg-soft);
+    padding: 0.1rem 0.35rem;
+    border-radius: 5px;
+    font-size: 0.88em;
+  }
+</style>

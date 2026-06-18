@@ -1,0 +1,17 @@
+[
+  {
+    "id": "tne-case-macos",
+    "app": "tne-case",
+    "platform": "macos",
+    "url": "https://github.com/TNE-CASE/TGE_CASE-web-page/releases",
+    "size": "175 MB",
+    "note": "Apple Silicon (.app)"
+  },
+  {
+    "id": "tne-case-windows",
+    "app": "tne-case",
+    "platform": "windows",
+    "url": "https://github.com/TNE-CASE/TGE_CASE-web-page/releases",
+    "note": "Installer (.exe)"
+  }
+]
