@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import AppCard from '../components/AppCard.astro';
+import { getLogo } from '../lib/media';
 
 const apps = (await getCollection('apps')).sort((a, b) => {
   if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
@@ -16,14 +17,6 @@ for (const d of downloads) {
   platformsByApp.set(key, [...(platformsByApp.get(key) ?? []), d.data.platform]);
 }
 
-// Join the visuals table → the card logo (first logo/icon row per app).
-const visuals = await getCollection('visuals');
-const logoByApp = new Map<string, string>();
-for (const v of visuals) {
-  if ((v.data.kind === 'logo' || v.data.kind === 'icon') && !logoByApp.has(v.data.app.id)) {
-    logoByApp.set(v.data.app.id, v.data.file);
-  }
-}
 ---
 
 <Base title="App Hub — Apps">
@@ -35,11 +28,7 @@ for (const v of visuals) {
   <section class="grid">
     {
       apps.map((app) => (
-        <AppCard
-          app={app}
-          platforms={platformsByApp.get(app.id) ?? []}
-          logo={logoByApp.get(app.id)}
-        />
+        <AppCard app={app} platforms={platformsByApp.get(app.id) ?? []} logo={getLogo(app.id)} />
       ))
     }
   </section>

@@ -28,17 +28,21 @@ pnpm preview  # serve the build output locally
 
 ## Data model
 
-The data is **normalized** into five separate collections, linked by an `app` reference (foreign key):
+The data is **normalized** into four separate collections, linked by an `app` reference (foreign key):
 
 | Collection | File | One row = |
 |---|---|---|
 | `apps` | `src/content/apps/<id>.md` | an app (base fields + long-description body) |
 | `downloads` | `src/data/downloads.json` | one app+platform download/play link |
 | `guides` | `src/data/guides.json` | one guide / resource |
-| `visuals` | `src/data/visuals.json` | one image (logo / icon / screenshot / background) |
 | `stats` | `src/data/stats.json` | one exposed statistic (static, or live via a CORS endpoint) |
 
-`CONTENT.md` is the human-friendly editing surface — the same five tables in Markdown. Edit there,
+**Images are not a collection.** The logo and screenshots are **auto-discovered** from
+`public/apps/<id>/` at build time (`src/lib/media.ts`) — just drop files in, no JSON to maintain:
+- `public/apps/<id>/logo.png` → card + detail logo
+- `public/apps/<id>/screenshots/*` → detail-page gallery (sorted by filename; prefix `01-`, `02-` to control order)
+
+`CONTENT.md` is the human-friendly editing surface — the same four tables in Markdown. Edit there,
 then the values are transferred into the files above.
 
 ## How to add a new app
@@ -48,9 +52,9 @@ then the values are transferred into the files above.
 2. Add the app's rows to the data tables (set `"app": "<id>"` on each row):
    - `src/data/downloads.json` — one row per platform (`web`/`macos`/`windows`/`linux`)
    - `src/data/guides.json` — one row per guide
-   - `src/data/visuals.json` — a `logo` row (for the card) + any `screenshot` rows
    - `src/data/stats.json` — optional exposed stats (`static`, or `live` with a CORS endpoint)
-3. Put assets under `public/apps/<id>/`: `logo.png`, `screenshots/*.png`, `guides/*.pdf`.
+3. Drop images into `public/apps/<id>/` — `logo.png` and `screenshots/*` are picked up automatically.
+   Put downloadable guides under `public/apps/<id>/guides/`.
 4. **Do not commit** large `.app`/`.exe`/`.zip` files — upload them to the corresponding game's GitHub
    Releases page and only set the `url` in `downloads.json`.
 5. Check with `pnpm dev` — the card and detail page appear automatically.
@@ -69,14 +73,14 @@ src/
   data/
     downloads.json       # "downloads" table (rows reference app)
     guides.json          # "guides" table
-    visuals.json         # "visuals" table (logo / icon / screenshot / background)
     stats.json           # "stats" table (static or live-via-CORS)
   layouts/Base.astro     # theme + global styles
   components/             # AppCard, DownloadButtons, GuideList, ScreenshotGallery, Stats
   pages/
-    index.astro          # card grid (joins downloads → chips, visuals → logo)
-    apps/[id].astro      # detail page (joins downloads/guides/visuals/stats by app id)
+    index.astro          # card grid (joins downloads → chips, auto logo)
+    apps/[id].astro      # detail page (joins downloads/guides/stats + auto logo/screenshots)
   lib/url.ts             # GitHub Pages base-path helper
+  lib/media.ts           # auto-discovers logo + screenshots from public/apps/<id>/
 public/apps/<id>/        # logo, screenshots, guides (served statically)
 CONTENT.md               # editing surface: the 4 tables in Markdown
 templates/app.template.md

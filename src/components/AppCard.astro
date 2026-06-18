@@ -5,7 +5,7 @@ import { withBase } from '../lib/url';
 interface Props {
   app: CollectionEntry<'apps'>;
   platforms?: string[]; // platform keys present in the downloads table for this app
-  logo?: string; // logo/icon path from the visuals table
+  logo?: string; // logo path, auto-discovered from public/apps/<id>/
 }
 
 const { app, platforms = [], logo } = Astro.props;

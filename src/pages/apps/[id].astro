@@ -7,6 +7,7 @@ import GuideList from '../../components/GuideList.astro';
 import ScreenshotGallery from '../../components/ScreenshotGallery.astro';
 import Stats from '../../components/Stats.astro';
 import { withBase } from '../../lib/url';
+import { getLogo, getScreenshots } from '../../lib/media';
 
 export const getStaticPaths = (async () => {
   const apps = await getCollection('apps');
@@ -24,15 +25,13 @@ const downloads = (await getCollection('downloads'))
 const guides = (await getCollection('guides'))
   .filter((g) => g.data.app.id === app.id)
   .map((g) => g.data);
-const appVisuals = (await getCollection('visuals')).filter((v) => v.data.app.id === app.id);
 const stats = (await getCollection('stats'))
   .filter((s) => s.data.app.id === app.id)
   .map((s) => s.data);
 
-const logo = appVisuals.find((v) => v.data.kind === 'logo' || v.data.kind === 'icon')?.data.file;
-const screenshots = appVisuals
-  .filter((v) => v.data.kind === 'screenshot' || v.data.kind === 'background')
-  .map((v) => v.data.file);
+// Logo + screenshots are auto-discovered from public/apps/<id>/ (no JSON to maintain).
+const logo = getLogo(app.id);
+const screenshots = getScreenshots(app.id).map((s) => s.file);
 
 const hasDownloads = downloads.length > 0;
 const hasGuides = guides.length > 0 || !!data.repo;

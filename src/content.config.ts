@@ -9,8 +9,10 @@ import { glob, file } from 'astro/loaders';
 //   apps         src/content/apps/<id>.md   one file per app (base fields + long description body)
 //   downloads    src/data/downloads.json    one row per app+platform
 //   guides       src/data/guides.json       one row per guide/resource
-//   visuals      src/data/visuals.json      one row per image (logo / icon / screenshot / background)
 //   stats        src/data/stats.json        one row per exposed statistic
+//
+// Images are NOT a collection — logo + screenshots are auto-discovered from
+// public/apps/<id>/ at build time (see src/lib/media.ts).
 // ---------------------------------------------------------------------------
 
 // "Apps" table — base fields in frontmatter, long description in the markdown body.
@@ -53,17 +55,6 @@ const guides = defineCollection({
   }),
 });
 
-// "Visuals" table — all imagery: the card logo/icon, plus detail-page screenshots.
-const visuals = defineCollection({
-  loader: file('src/data/visuals.json'),
-  schema: z.object({
-    app: reference('apps'), // FK -> apps.id
-    kind: z.enum(['logo', 'icon', 'screenshot', 'background']).default('screenshot'),
-    file: z.string(), // /apps/<id>/...
-    caption: z.string().optional(),
-  }),
-});
-
 // "Stats" table — exposed per-app statistics.
 //   source: "static" → `value` shown as-is (manually maintained).
 //   source: "live"   → browser fetches `url` and reads `field` (dot-path) to update the value.
@@ -82,4 +73,4 @@ const stats = defineCollection({
   }),
 });
 
-export const collections = { apps, downloads, guides, visuals, stats };
+export const collections = { apps, downloads, guides, stats };

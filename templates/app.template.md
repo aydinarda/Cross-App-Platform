@@ -5,9 +5,9 @@
 # 3) Add the app's rows in the data tables (set app = "<id>" on each row):
 #       src/data/downloads.json   (one row per platform: web/macos/windows/linux)
 #       src/data/guides.json      (one row per guide)
-#       src/data/visuals.json     (a "logo" row for the card + any "screenshot" rows)
 #       src/data/stats.json       (optional: exposed stats, static or live-via-CORS)
-# 4) Put assets under  public/apps/<id>/  (logo.png, screenshots/, guides/).
+# 4) Drop images into  public/apps/<id>/  — logo.png + screenshots/* are auto-discovered (no JSON).
+#    Put guides under  public/apps/<id>/guides/.
 # 5) Upload large .app/.exe files to GitHub Releases; only link them in downloads.json.
 
 title: App Name

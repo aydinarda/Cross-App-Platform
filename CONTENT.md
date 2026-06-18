@@ -1,21 +1,23 @@
 # CONTENT — editing surface (separate tables)
 
-The data is **normalized** into separate tables. Edit the **5 tables** below and hand the file back;
+The data is **normalized** into separate tables. Edit the **4 tables** below and hand the file back;
 the values get transferred into the matching collection files. The tables are linked by `app` (= app id) —
-i.e. each download / guide / visual / stat row belongs to the app whose `id` it carries (a foreign key).
+i.e. each download / guide / stat row belongs to the app whose `id` it carries (a foreign key).
 
 | Table | File | One row = |
 |---|---|---|
 | **Apps** | `src/content/apps/<id>.md` | an app (base fields + long description) |
 | **Downloads** | `src/data/downloads.json` | one app+platform download/play link |
 | **Guides** | `src/data/guides.json` | one guide / resource |
-| **Visuals** | `src/data/visuals.json` | one image (logo / icon / screenshot / background) |
 | **Stats** | `src/data/stats.json` | one exposed statistic |
+
+> **Images are automatic — no table.** Just drop files into `public/apps/<id>/` and they're picked up at build:
+> `logo.png` (card + detail logo) and everything in `screenshots/` (gallery). See the "Images" note below.
 
 **Rules**
 - Leave unknown values as `<<FILL: ...>>`. Delete rows that don't apply (don't leave blank rows).
 - The `app` column must **exactly** match an `id` in the Apps table.
-- Put images/guides under `public/apps/<id>/...` (or hand them to me and I'll place them).
+- Put guides under `public/apps/<id>/guides/` (or hand them to me and I'll place them).
 - For large `.app`/`.exe`/`.zip`, upload to GitHub Releases and put only the link in Downloads.
 
 ---
@@ -23,7 +25,7 @@ i.e. each download / guide / visual / stat row belongs to the app whose `id` it 
 ## TABLE 1 — Apps
 
 > Base info. `status`: live | beta | wip · `featured`: true|false · `order`: smaller = first · `accent`: hex color.
-> (The logo is no longer here — it lives in the **Visuals** table as a `logo` row.)
+> (No logo column — the logo is auto-loaded from `public/apps/<id>/logo.png`.)
 
 | id | title | tagline | description | category | status | featured | order | accent | repo |
 |----|-------|---------|-------------|----------|--------|----------|-------|--------|------|
@@ -101,23 +103,20 @@ download the installer `.exe` from the Releases page.
 
 ---
 
-## TABLE 4 — Visuals
+## Images (automatic — no table)
 
-> All imagery. `kind`: logo | icon | screenshot | background.
-> The card uses the `logo` (or `icon`) row; the detail-page gallery uses `screenshot`/`background` rows.
-> `file` = `/apps/<id>/...`. `caption` is optional.
+There is **no visuals table**. Logo and screenshots are auto-discovered from the filesystem at build:
 
-| app | kind | file | caption |
-|-----|------|------|---------|
-| newsvendor | logo | /apps/newsvendor/logo.png | |
-| newsvendor | screenshot | /apps/newsvendor/screenshots/background.png | Placeholder (background image) |
-| newsvendor | screenshot | `<<FILL: real in-game screenshot>>` | |
-| tne-case | logo | /apps/tne-case/logo.png | |
-| tne-case | screenshot | `<<FILL: screenshot (none yet)>>` | |
+- **Logo:** drop `public/apps/<id>/logo.png` → used on the card and detail page.
+- **Screenshots:** drop any images into `public/apps/<id>/screenshots/` → all shown in the gallery.
+  - Sorted by filename. To control order, prefix with numbers: `01-home.png`, `02-start.png`, …
+  - The caption is auto-derived from the filename (`01-Home-Page.png` → "Home Page").
+
+Just add/remove files — nothing to edit here. (Filenames are case-sensitive on the live site.)
 
 ---
 
-## TABLE 5 — Stats
+## TABLE 4 — Stats
 
 > Exposed per-app statistics. `source`:
 > - **static** → `value` is shown as-is (you maintain it by hand). Use this for desktop / self-contained apps.
@@ -140,8 +139,8 @@ download the installer `.exe` from the Releases page.
 ## Adding a new app
 
 1. Add a new row to **Apps** (with a new `id`) and a long-description block under it.
-2. For that `id`, add the relevant rows to **Downloads / Guides / Visuals / Stats** (include a `logo` visual).
-3. Put assets under `public/apps/<id>/`.
+2. For that `id`, add the relevant rows to **Downloads / Guides / Stats**.
+3. Drop images into `public/apps/<id>/` (`logo.png` + `screenshots/*`) and guides into `guides/` — images auto-load.
 
 Hand the file back and I'll transfer it into `src/content/apps/<id>.md` + `src/data/*.json`, then verify
 with `pnpm build`.
