@@ -8,6 +8,7 @@ import ScreenshotGallery from '../../components/ScreenshotGallery.astro';
 import Stats from '../../components/Stats.astro';
 import { withBase } from '../../lib/url';
 import { getLogo, getScreenshots } from '../../lib/media';
+import statsData from '../../data/stats.json';
 
 export const getStaticPaths = (async () => {
   const apps = (await getCollection('apps')).filter((app) => !app.data.draft); // hide drafts
@@ -25,9 +26,11 @@ const downloads = (await getCollection('downloads'))
 const guides = (await getCollection('guides'))
   .filter((g) => g.data.app.id === app.id)
   .map((g) => g.data);
-const stats = (await getCollection('stats'))
-  .filter((s) => s.data.app.id === app.id)
-  .map((s) => s.data);
+// Skip getCollection('stats') while stats.json is empty — Astro warns on an empty collection.
+const stats =
+  statsData.length === 0
+    ? []
+    : (await getCollection('stats')).filter((s) => s.data.app.id === app.id).map((s) => s.data);
 
 // Logo + screenshots are auto-discovered from public/apps/<id>/ (no JSON to maintain).
 const logo = getLogo(app.id);

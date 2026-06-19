@@ -1,19 +1,2 @@
 [
-  {
-    "id": "tne-case-size",
-    "app": "tne-case",
-    "label": "Download size",
-    "value": "175",
-    "suffix": "MB",
-    "icon": "💾",
-    "source": "static"
-  },
-  {
-    "id": "tne-case-platforms",
-    "app": "tne-case",
-    "label": "Platforms",
-    "value": "macOS · Windows",
-    "icon": "🖥️",
-    "source": "static"
-  }
 ]

@@ -26,7 +26,15 @@
     "app": "arya-phones",
     "platform": "web",
     "url": "https://aryaphonesupp.onrender.com",
-    "note": "Temporarily offline — hosted instance is currently down"
+    "note": "Temporarily offline"
+  },
+
+  {
+    "id": "green-tech-transition-web",
+    "app": "green-tech-transition",
+    "platform": "web",
+    "url": "https://simplegreentechtransition.onrender.com",
+    "note": "Temporarily offline"
   }
 
 ]

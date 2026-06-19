@@ -33,6 +33,7 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 | newsvendor | Simple Newsvendor Game | Multiplayer in-class inventory (newsvendor) simulation | Students place orders against a shared random demand; an admin runs the game round by round. | Simulation Game | live | true | 1 | #5b8cff | https://github.com/aydinarda/SimpleNewsVendorGame |
 | tne-case | TNE Case (TGECase) | Demand & scenario simulation desktop app | A Streamlit-based, packaged desktop simulation/optimization application. | Simulation / Optimization | live | false | 2 | #34d399 | https://github.com/TNE-CASE/TGE_CASE-web-page |
 | arya-phones | Arya Phones — Supplier Selection Game | Multiplayer classroom supplier-selection simulation | Competing teams pick smartphone-component suppliers to maximize profit or utility under environmental and social risk caps, while a facilitator runs live rounds. | Simulation Game | down | false | 3 | #ef4444 | https://github.com/aydinarda/AryaPhoneSupp |
+| green-tech-transition | Green Tech Transition Game | Multiplayer classroom green-investment simulation | Teams decide how much to invest in green capacity against uncertain green demand, balancing under-investment (lost customers) against over-investment (wasted capacity), while a facilitator runs live rounds. | Simulation Game | down | false | 4 | #16a34a | https://github.com/aydinarda/SimpleGreenTechTransition |
 
 **Long descriptions** (each app's detail-page body — Markdown). These don't fit in a table cell, so they live in their own blocks:
 
@@ -97,6 +98,34 @@ in real time over WebSockets.
 ```
 </details>
 
+<details><summary><code>green-tech-transition</code> — long description</summary>
+
+```markdown
+**Green Tech Transition Game** is a classroom simulation about investing in green technology under
+uncertainty. Each round a random level of green demand appears; players choose how much capacity to
+invest in. Under-investors lose green customers, over-investors waste capacity — and residual green
+demand can be picked up (or "stolen") by others. A facilitator configures the parameters and runs the
+game round by round.
+
+### How to play
+1. The facilitator creates a game, sets the parameters (green-demand range, number of rounds, rewards
+   and penalties), and shares the room code.
+2. Players join with a name and wait in the lobby.
+3. The facilitator starts a round; each player submits their green-tech investment.
+4. The facilitator resolves the round → demand is revealed, allocation is computed, and rewards /
+   penalties are scored on a live leaderboard.
+5. Repeat for the configured number of rounds, then review the final results.
+
+### Tech
+- Backend: Python + FastAPI + Uvicorn · market logic with NumPy
+- Frontend: Vanilla JS / HTML / CSS (no build step)
+- Database: SQLAlchemy + databases (PostgreSQL / SQLite)
+- Hosting: Render (free tier)
+
+> The hosted instance is temporarily offline (status: down).
+```
+</details>
+
 ---
 
 ## TABLE 2 — Downloads
@@ -111,6 +140,7 @@ in real time over WebSockets.
 | tne-case | macos | `<<FILL: Releases .zip link>>` | 175 MB | Apple Silicon (.app) | |
 | tne-case | windows | `<<FILL: Releases .exe link — build the installer first>>` | | Installer (.exe) | |
 | arya-phones | web | https://aryaphonesupp.onrender.com | | Temporarily offline — hosted instance is currently down | |
+| green-tech-transition | web | https://simplegreentechtransition.onrender.com | | Temporarily offline — hosted instance is currently down | |
 
 ---
 
@@ -152,12 +182,14 @@ Just add/remove files — nothing to edit here. (Filenames are case-sensitive on
 >   The app must expose a **public, CORS-enabled** JSON endpoint (e.g. the newsvendor backend's `/health`
 >   or `/stats`). `value` is used as the fallback until the fetch returns. `suffix` is an optional unit.
 
+> **Planned — none live yet.** `src/data/stats.json` is currently an empty `[]`. We'll add real
+> metrics here in the future (e.g. how many times an app was visited, how many users, games played,
+> etc.). Add a row below for each stat you want shown, then it gets transferred into `stats.json`.
+> (Reminder: `.json` can't hold comments — keep notes like this here in CONTENT.md, not in the data file.)
+
 | app | label | value | suffix | icon | source | url | field |
 |-----|-------|-------|--------|------|--------|-----|-------|
-| tne-case | Download size | 175 | MB | 💾 | static | | |
-| tne-case | Platforms | macOS · Windows | | 🖥️ | static | | |
-| newsvendor | Players online | 0 | | 👥 | live | `<<FILL: e.g. https://your-backend.onrender.com/health>>` | `<<FILL: JSON field, e.g. activePlayers>>` |
-| newsvendor | Games played | `<<FILL: number or leave for live>>` | | 🎮 | static | | |
+| `<<FILL: app id>>` | `<<FILL: e.g. Visits>>` | `<<FILL>>` | | 📊 | static | | |
 
 > Reminder: the site is **static** (GitHub Pages), so it cannot count anything itself. `live` stats are
 > fetched **in the visitor's browser** at view time — only works if the app's endpoint is public + CORS-enabled.
