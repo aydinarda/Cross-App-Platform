@@ -33,7 +33,9 @@ const stats = (await getCollection('stats'))
 const logo = getLogo(app.id);
 const screenshots = getScreenshots(app.id).map((s) => s.file);
 
-const hasDownloads = downloads.length > 0;
+// The web "Play" link is the header CTA; desktop installers go in the Download section.
+const webUrl = downloads.find((d) => d.platform === 'web')?.url;
+const desktopDownloads = downloads.filter((d) => d.platform !== 'web');
 const hasGuides = guides.length > 0 || !!data.repo;
 ---
 
@@ -54,15 +56,21 @@ const hasGuides = guides.length > 0 || !!data.repo;
         <span class={`badge badge-${data.status}`}>{data.status}</span>
       </div>
       {data.tagline && <p class="head-tag">{data.tagline}</p>}
-      {data.category && <span class="head-cat">{data.category}</span>}
     </div>
+    {
+      webUrl && (
+        <a class="btn btn-primary head-play" href={webUrl} target="_blank" rel="noopener">
+          ▶ Play
+        </a>
+      )
+    }
   </header>
 
   {
-    hasDownloads && (
+    desktopDownloads.length > 0 && (
       <section class="block">
-        <h2>Download / Play</h2>
-        <DownloadButtons downloads={downloads} />
+        <h2>Download</h2>
+        <DownloadButtons downloads={desktopDownloads} />
       </section>
     )
   }
@@ -148,7 +156,11 @@ const hasGuides = guides.length > 0 || !!data.repo;
     display: flex;
     gap: 1.1rem;
     align-items: center;
+    flex-wrap: wrap;
     margin: 1.2rem 0 2rem;
+  }
+  .head-text {
+    flex: 1 1 240px;
   }
   .head-logo {
     width: 84px;
@@ -177,12 +189,20 @@ const hasGuides = guides.length > 0 || !!data.repo;
     font-size: 1.8rem;
   }
   .head-tag {
-    margin: 0.3rem 0 0.4rem;
+    margin: 0.3rem 0 0;
     color: var(--text);
   }
-  .head-cat {
-    font-size: 0.8rem;
-    color: var(--text-dim);
+  .head-play {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 1rem;
+    padding: 0.7rem 1.4rem;
+    white-space: nowrap;
+  }
+  @media (max-width: 540px) {
+    .head-play {
+      margin-left: 0;
+    }
   }
 
   .block {
