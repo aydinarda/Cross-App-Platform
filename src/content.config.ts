@@ -23,7 +23,7 @@ const apps = defineCollection({
     tagline: z.string().optional(),
     description: z.string().optional(), // short text shown on the card
     category: z.string().optional(),
-    status: z.enum(['live', 'beta', 'wip']).default('live'),
+    status: z.enum(['live', 'beta', 'wip', 'down']).default('live'), // "down" = temporarily offline (red badge)
     draft: z.boolean().default(false), // true = hidden everywhere (no card, no detail page)
     featured: z.boolean().default(false),
     order: z.number().default(999), // home page ordering (smaller = first)

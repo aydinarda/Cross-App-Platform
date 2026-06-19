@@ -15,10 +15,18 @@
     "note": "Installer (.exe)"
   },
 
-  { "id": "newsvendor-web", 
-    "app": "newsvendor", 
-    "platform": "web", 
-    "url": "https://simplenewsvendorgameclient.onrender.com/" 
+  { "id": "newsvendor-web",
+    "app": "newsvendor",
+    "platform": "web",
+    "url": "https://simplenewsvendorgameclient.onrender.com/"
+  },
+
+  {
+    "id": "arya-phones-web",
+    "app": "arya-phones",
+    "platform": "web",
+    "url": "https://aryaphonesupp.onrender.com",
+    "note": "Temporarily offline — hosted instance is currently down"
   }
 
 ]

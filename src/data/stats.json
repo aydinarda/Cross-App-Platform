@@ -15,5 +15,21 @@
     "value": "macOS · Windows",
     "icon": "🖥️",
     "source": "static"
+  },
+  {
+    "id": "arya-phones-mode",
+    "app": "arya-phones",
+    "label": "Mode",
+    "value": "Multiplayer · live rounds",
+    "icon": "🎮",
+    "source": "static"
+  },
+  {
+    "id": "arya-phones-model",
+    "app": "arya-phones",
+    "label": "Market model",
+    "value": "MNL + MILP",
+    "icon": "📈",
+    "source": "static"
   }
 ]

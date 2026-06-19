@@ -24,7 +24,7 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 
 ## TABLE 1 — Apps
 
-> Base info. `status`: live | beta | wip · `featured`: true|false · `order`: smaller = first · `accent`: hex color.
+> Base info. `status`: live | beta | wip | down (= temporarily offline, red badge) · `featured`: true|false · `order`: smaller = first · `accent`: hex color.
 > (No logo column — the logo is auto-loaded from `public/apps/<id>/logo.png`.)
 > To **hide** an app, add `draft: true` to its `src/content/apps/<id>.md` frontmatter (no card, no page). Currently: `tne-case` is hidden.
 
@@ -32,6 +32,7 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 |----|-------|---------|-------------|----------|--------|----------|-------|--------|------|
 | newsvendor | Simple Newsvendor Game | Multiplayer in-class inventory (newsvendor) simulation | Students place orders against a shared random demand; an admin runs the game round by round. | Simulation Game | live | true | 1 | #5b8cff | https://github.com/aydinarda/SimpleNewsVendorGame |
 | tne-case | TNE Case (TGECase) | Demand & scenario simulation desktop app | A Streamlit-based, packaged desktop simulation/optimization application. | Simulation / Optimization | live | false | 2 | #34d399 | https://github.com/TNE-CASE/TGE_CASE-web-page |
+| arya-phones | Arya Phones — Supplier Selection Game | Multiplayer classroom supplier-selection simulation | Competing teams pick smartphone-component suppliers to maximize profit or utility under environmental and social risk caps, while a facilitator runs live rounds. | Simulation Game | down | false | 3 | #ef4444 | https://github.com/aydinarda/AryaPhoneSupp |
 
 **Long descriptions** (each app's detail-page body — Markdown). These don't fit in a table cell, so they live in their own blocks:
 
@@ -71,6 +72,36 @@ download the installer `.exe` from the Releases page.
 ```
 </details>
 
+<details><summary><code>arya-phones</code> — long description</summary>
+
+```markdown
+**Arya Phones — Supplier Selection Game** is a classroom simulation where competing teams choose
+smartphone-component suppliers to maximize profit or utility, subject to environmental and social
+risk caps. A facilitator manages sessions and rounds; results appear on a live leaderboard updated
+in real time over WebSockets.
+
+### How to play
+1. The facilitator opens **Admin**, creates a session, and shares the short **session code**.
+2. Players join with a team name and the session code, then wait in the lobby.
+3. The facilitator starts a round; players select suppliers and set a price per user.
+4. Players **Evaluate** to preview their metrics, then **Submit** to lock in.
+5. The facilitator runs **Market Matching** (MNL demand) and reviews the leaderboard.
+
+### Constraints
+- Average environmental risk ≤ 3.25
+- Average social risk ≤ 3.5
+- At least 1 supplier selected
+
+### Tech
+- Backend: Python + FastAPI + Uvicorn
+- Frontend: Vanilla JS / HTML / CSS (no build step)
+- Database: Supabase (PostgreSQL)
+- Real-time: WebSockets · Charts: Plotly
+
+> The hosted instance is temporarily offline (status: down).
+```
+</details>
+
 ---
 
 ## TABLE 2 — Downloads
@@ -84,6 +115,7 @@ download the installer `.exe` from the Releases page.
 | newsvendor | web | `<<FILL: live Render URL, e.g. https://newsvendor.onrender.com>>` | | | |
 | tne-case | macos | `<<FILL: Releases .zip link>>` | 175 MB | Apple Silicon (.app) | |
 | tne-case | windows | `<<FILL: Releases .exe link — build the installer first>>` | | Installer (.exe) | |
+| arya-phones | web | https://aryaphonesupp.onrender.com | | Temporarily offline — hosted instance is currently down | |
 
 ---
 
@@ -131,6 +163,8 @@ Just add/remove files — nothing to edit here. (Filenames are case-sensitive on
 | tne-case | Platforms | macOS · Windows | | 🖥️ | static | | |
 | newsvendor | Players online | 0 | | 👥 | live | `<<FILL: e.g. https://your-backend.onrender.com/health>>` | `<<FILL: JSON field, e.g. activePlayers>>` |
 | newsvendor | Games played | `<<FILL: number or leave for live>>` | | 🎮 | static | | |
+| arya-phones | Mode | Multiplayer · live rounds | | 🎮 | static | | |
+| arya-phones | Market model | MNL + MILP | | 📈 | static | | |
 
 > Reminder: the site is **static** (GitHub Pages), so it cannot count anything itself. `live` stats are
 > fetched **in the visitor's browser** at view time — only works if the app's endpoint is public + CORS-enabled.
