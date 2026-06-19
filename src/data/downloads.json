@@ -13,5 +13,12 @@
     "platform": "windows",
     "url": "https://github.com/TNE-CASE/TGE_CASE-web-page/releases",
     "note": "Installer (.exe)"
+  },
+
+  { "id": "newsvendor-web", 
+    "app": "newsvendor", 
+    "platform": "web", 
+    "url": "https://simplenewsvendorgameclient.onrender.com/" 
   }
+
 ]
