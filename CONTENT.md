@@ -87,11 +87,6 @@ in real time over WebSockets.
 4. Players **Evaluate** to preview their metrics, then **Submit** to lock in.
 5. The facilitator runs **Market Matching** (MNL demand) and reviews the leaderboard.
 
-### Constraints
-- Average environmental risk ≤ 3.25
-- Average social risk ≤ 3.5
-- At least 1 supplier selected
-
 ### Tech
 - Backend: Python + FastAPI + Uvicorn
 - Frontend: Vanilla JS / HTML / CSS (no build step)
