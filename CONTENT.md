@@ -163,8 +163,6 @@ Just add/remove files — nothing to edit here. (Filenames are case-sensitive on
 | tne-case | Platforms | macOS · Windows | | 🖥️ | static | | |
 | newsvendor | Players online | 0 | | 👥 | live | `<<FILL: e.g. https://your-backend.onrender.com/health>>` | `<<FILL: JSON field, e.g. activePlayers>>` |
 | newsvendor | Games played | `<<FILL: number or leave for live>>` | | 🎮 | static | | |
-| arya-phones | Mode | Multiplayer · live rounds | | 🎮 | static | | |
-| arya-phones | Market model | MNL + MILP | | 📈 | static | | |
 
 > Reminder: the site is **static** (GitHub Pages), so it cannot count anything itself. `live` stats are
 > fetched **in the visitor's browser** at view time — only works if the app's endpoint is public + CORS-enabled.
