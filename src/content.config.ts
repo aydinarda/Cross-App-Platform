@@ -1,5 +1,6 @@
 import { defineCollection, reference, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
+import { APP_STATUSES, APP_STATUS } from './lib/status';
 
 // ---------------------------------------------------------------------------
 // Normalized, table-based data model.
@@ -23,7 +24,7 @@ const apps = defineCollection({
     tagline: z.string().optional(),
     description: z.string().optional(), // short text shown on the card
     category: z.string().optional(),
-    status: z.enum(['live', 'beta', 'wip', 'down']).default('live'), // "down" = temporarily offline (red badge)
+    status: z.enum(APP_STATUSES).default(APP_STATUS.LIVE), // values defined in src/lib/status.ts ("down" = offline, "preparation" = not built yet)
     draft: z.boolean().default(false), // true = hidden everywhere (no card, no detail page)
     featured: z.boolean().default(false),
     order: z.number().default(999), // home page ordering (smaller = first)

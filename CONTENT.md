@@ -24,7 +24,7 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 
 ## TABLE 1 — Apps
 
-> Base info. `status`: live | beta | wip | down (= temporarily offline, red badge) · `featured`: true|false · `order`: smaller = first · `accent`: hex color.
+> Base info. `status`: live | beta | wip | down (= temporarily offline, red badge) | preparation (= announced, not built yet, indigo badge) · `featured`: true|false · `order`: smaller = first · `accent`: hex color.
 > (No logo column — the logo is auto-loaded from `public/apps/<id>/logo.png`.)
 > To **hide** an app, add `draft: true` to its `src/content/apps/<id>.md` frontmatter (no card, no page). Currently: `tne-case` is hidden.
 
@@ -34,6 +34,7 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 | tne-case | TNE Case (TGECase) | Demand & scenario simulation desktop app | A Streamlit-based, packaged desktop simulation/optimization application. | Simulation / Optimization | live | false | 2 | #34d399 | https://github.com/TNE-CASE/TGE_CASE-web-page |
 | arya-phones | Arya Phones — Supplier Selection Game | Multiplayer classroom supplier-selection simulation | Competing teams pick smartphone-component suppliers to maximize profit or utility under environmental and social risk caps, while a facilitator runs live rounds. | Simulation Game | down | false | 3 | #ef4444 | https://github.com/aydinarda/AryaPhoneSupp |
 | green-tech-transition | Green Tech Transition Game | Multiplayer classroom green-investment simulation | Teams decide how much to invest in green capacity against uncertain green demand, balancing under-investment (lost customers) against over-investment (wasted capacity), while a facilitator runs live rounds. | Simulation Game | down | false | 4 | #16a34a | https://github.com/aydinarda/SimpleGreenTechTransition |
+| order-up-to | Order-Up-To Inventory Game | Multiplayer classroom order-up-to (base-stock) simulation with lead time | Players set an order-up-to level each round; lead-time delays cause lost sales, and order frequency drives CO₂ emissions. | Simulation Game | preparation | false | 5 | #818cf8 | _(none yet)_ |
 
 **Long descriptions** (each app's detail-page body — Markdown). These don't fit in a table cell, so they live in their own blocks:
 
@@ -123,6 +124,31 @@ game round by round.
 - Hosting: Render (free tier)
 
 > The hosted instance is temporarily offline (status: down).
+```
+</details>
+
+<details><summary><code>order-up-to</code> — long description</summary>
+
+```markdown
+> **In preparation.** This game is being designed — the card is a placeholder while requirements
+> and documentation are written. Check back soon.
+
+A multiplayer **order-up-to (base-stock)** inventory simulation — the multi-period sibling of the
+Newsvendor game. Each round students set an **order-up-to level S**; the system replenishes up to
+that level, but new stock only arrives after a **lead time**, so demand during the wait can turn
+into **lost sales**. On top of profit, each shipment carries a **CO₂ cost** — order often for high
+service, or batch orders to cut emissions.
+
+### How it will work
+1. The admin sets lead time, demand, and cost/CO₂ parameters; students join.
+2. Each round, players set their **order-up-to level S** given on-hand and in-transit stock.
+3. Demand is realized; unmet demand is **lost**; replenishment arrives after the **lead time**.
+4. Profit and **CO₂ emissions** update; the leaderboard ranks players round by round.
+
+### Tech (planned)
+- Frontend: React + Vite
+- Backend: Express + WebSocket
+- Persistence (optional): Supabase PostgreSQL
 ```
 </details>
 
