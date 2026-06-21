@@ -30,5 +30,4 @@ game round by round.
 - **Database:** SQLAlchemy + `databases` (PostgreSQL / SQLite)
 - **Hosting:** Render (free tier)
 
-> The hosted instance is temporarily offline. When it's running on Render's free tier, the first
-> request after an idle period can take a few seconds (cold start).
+> The hosted instance may make a cold start, please wait for some time after reaching the page
