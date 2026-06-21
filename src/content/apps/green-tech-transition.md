@@ -3,7 +3,7 @@ title: Green Tech Transition Game
 tagline: Multiplayer classroom green-investment simulation
 description: Teams decide how much to invest in green capacity against uncertain green demand, balancing under-investment (lost customers) against over-investment (wasted capacity), while a facilitator runs live rounds.
 category: Simulation Game
-status: down # temporarily offline — flip to live/beta once it's back up
+status: live # temporarily offline — flip to live/beta once it's back up
 order: 4
 accent: '#16a34a'
 repo: https://github.com/aydinarda/SimpleGreenTechTransition
