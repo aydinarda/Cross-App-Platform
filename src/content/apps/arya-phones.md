@@ -2,8 +2,8 @@
 title: Arya Phones — Supplier Selection Game
 tagline: Multiplayer classroom supplier-selection simulation
 description: Competing teams pick smartphone-component suppliers to maximize profit or utility under environmental and social risk caps, while a facilitator runs live rounds.
-category: Simulation Game
-status: down # temporarily offline — flip to live/beta once it's back up
+category: Simulation Game & Market Game
+status: live # temporarily offline — flip to live/beta once it's back up
 order: 3
 accent: '#ef4444'
 repo: https://github.com/aydinarda/AryaPhoneSupp
