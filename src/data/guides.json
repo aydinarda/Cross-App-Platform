@@ -17,8 +17,8 @@
     "id": "arya-phones-admin",
     "app": "arya-phones",
     "type": "admin",
-    "label": "Admin Guide (.docx)",
-    "url": "/apps/arya-phones/guides/admin-guide.docx"
+    "label": "Admin Guide (.pdf)",
+    "url": "/apps/arya-phones/guides/admin-guide.pdf"
   }
   
 ]
