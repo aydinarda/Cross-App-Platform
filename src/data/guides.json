@@ -12,5 +12,13 @@
     "type": "build",
     "label": "Build Guide (README_BUILD)",
     "url": "https://github.com/TNE-CASE/TGE_CASE-web-page/blob/main/README_BUILD.md"
+  },
+  {
+    "id": "arya-phones-admin",
+    "app": "arya-phones",
+    "type": "admin",
+    "label": "Admin Guide (.docx)",
+    "url": "/apps/arya-phones/guides/admin-guide.docx"
   }
+  
 ]
