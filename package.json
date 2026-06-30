@@ -7,6 +7,11 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "check": "astro check",
+    "test": "node --test tests/data/*.test.js",
+    "test:data": "node --test tests/data/*.test.js",
+    "test:dist": "node --test tests/routes/*.test.js",
+    "verify": "pnpm check && pnpm test:data && pnpm build && pnpm test:dist",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
