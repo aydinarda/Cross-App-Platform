@@ -33,6 +33,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Verify
+        env:
+          APP_HUB_PASSWORD: ${{ secrets.APP_HUB_PASSWORD }}
         run: pnpm run verify
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
