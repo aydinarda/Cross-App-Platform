@@ -5,40 +5,47 @@ import { withBase } from '../lib/url';
 interface Props {
   title: string;
   description?: string;
+  passwordProtected?: boolean;
+  passwordStorageKey?: string;
 }
 
-const { title, description = 'A single showcase for teaching materials produced by UZH - Chair of Sustainable Operations Management.' } = Astro.props;
+const {
+  title,
+  description = 'A single showcase for teaching materials produced by UZH - Chair of Sustainable Operations Management.',
+  passwordProtected = false,
+  passwordStorageKey = 'app-hub-auth',
+} = Astro.props;
 const password = process.env.APP_HUB_PASSWORD ?? '';
-const passwordHash = password ? createHash('sha256').update(password).digest('hex') : '';
+const passwordHash = passwordProtected && password ? createHash('sha256').update(password).digest('hex') : '';
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class={passwordProtected ? 'password-protected' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title}</title>
-    <script is:inline>
-      try {
-        if (localStorage.getItem('app-hub-auth') === 'ok') {
-          document.documentElement.classList.add('auth-ok');
-        }
-      } catch {
-        // Keep the gate visible when browser storage is unavailable.
-      }
-    </script>
   </head>
   <body>
-    <section class="password-gate" aria-label="Password required">
-      <form class="password-card" data-password-form data-password-hash={passwordHash}>
-        <h1>App Hub</h1>
-        <label for="site-password">Password</label>
-        <input id="site-password" name="password" type="password" autocomplete="current-password" required />
-        <p class="password-error" data-password-error hidden>Wrong password.</p>
-        <button class="btn btn-primary" type="submit">Enter</button>
-      </form>
-    </section>
+    {
+      passwordProtected && (
+        <section class="password-gate" aria-label="Password required">
+          <form
+            class="password-card"
+            data-password-form
+            data-password-hash={passwordHash}
+            data-password-storage-key={passwordStorageKey}
+          >
+            <h1>Green Tech Transition</h1>
+            <label for="site-password">Password</label>
+            <input id="site-password" name="password" type="password" autocomplete="current-password" required />
+            <p class="password-error" data-password-error hidden>Wrong password.</p>
+            <button class="btn btn-primary" type="submit">Enter</button>
+          </form>
+        </section>
+      )
+    }
 
     <header class="site-header">
       <a class="brand" href={withBase('/')}>
@@ -58,40 +65,53 @@ const passwordHash = password ? createHash('sha256').update(password).digest('he
       <p>© {new Date().getFullYear()} App Hub — UZH - Chair of Sustainable Operations Management</p>
     </footer>
 
-    <script is:inline>
-      const form = document.querySelector('[data-password-form]');
-      const input = document.querySelector('#site-password');
-      const error = document.querySelector('[data-password-error]');
+    {
+      passwordProtected && (
+        <script is:inline>
+          const form = document.querySelector('[data-password-form]');
+          const input = document.querySelector('#site-password');
+          const error = document.querySelector('[data-password-error]');
+          const storageKey = form instanceof HTMLFormElement ? form.dataset.passwordStorageKey || 'app-hub-auth' : 'app-hub-auth';
 
-      form?.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        if (!(input instanceof HTMLInputElement) || !(error instanceof HTMLElement)) return;
-
-        const expectedHash = form instanceof HTMLFormElement ? form.dataset.passwordHash : '';
-        const actualHash = await sha256(input.value);
-
-        if (expectedHash && actualHash === expectedHash) {
           try {
-            localStorage.setItem('app-hub-auth', 'ok');
+            if (localStorage.getItem(storageKey) === 'ok') {
+              document.documentElement.classList.add('auth-ok');
+            }
           } catch {
-            // Opening the current page is enough if browser storage is unavailable.
+            // Keep the gate visible when browser storage is unavailable.
           }
-          document.documentElement.classList.add('auth-ok');
-          error.hidden = true;
-          return;
-        }
 
-        error.hidden = false;
-        input.value = '';
-        input.focus();
-      });
+          form?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!(input instanceof HTMLInputElement) || !(error instanceof HTMLElement)) return;
 
-      async function sha256(value) {
-        const data = new TextEncoder().encode(value);
-        const digest = await crypto.subtle.digest('SHA-256', data);
-        return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-      }
-    </script>
+            const expectedHash = form instanceof HTMLFormElement ? form.dataset.passwordHash : '';
+            const actualHash = await sha256(input.value);
+
+            if (expectedHash && actualHash === expectedHash) {
+              try {
+                localStorage.setItem(storageKey, 'ok');
+              } catch {
+                // Opening the current page is enough if browser storage is unavailable.
+              }
+              document.documentElement.classList.add('auth-ok');
+              error.hidden = true;
+              return;
+            }
+
+            error.hidden = false;
+            input.value = '';
+            input.focus();
+          });
+
+          async function sha256(value) {
+            const data = new TextEncoder().encode(value);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+          }
+        </script>
+      )
+    }
 
     <style is:global>
       :root {
@@ -132,13 +152,13 @@ const passwordHash = password ? createHash('sha256').update(password).digest('he
         text-decoration: none;
       }
 
-      html:not(.auth-ok) .site-header,
-      html:not(.auth-ok) main,
-      html:not(.auth-ok) .site-footer {
+      html.password-protected:not(.auth-ok) .site-header,
+      html.password-protected:not(.auth-ok) main,
+      html.password-protected:not(.auth-ok) .site-footer {
         display: none;
       }
 
-      html.auth-ok .password-gate {
+      html.password-protected.auth-ok .password-gate {
         display: none;
       }
 

@@ -40,9 +40,15 @@ const screenshots = getScreenshots(app.id).map((s) => s.file);
 const webUrl = downloads.find((d) => d.platform === 'web')?.url;
 const desktopDownloads = downloads.filter((d) => d.platform !== 'web');
 const hasGuides = guides.length > 0 || !!data.repo;
+const passwordProtected = app.id === 'green-tech-transition';
 ---
 
-<Base title={`${data.title} — App Hub`} description={data.tagline ?? data.description}>
+<Base
+  title={`${data.title} — App Hub`}
+  description={data.tagline ?? data.description}
+  passwordProtected={passwordProtected}
+  passwordStorageKey={`app-hub-${app.id}-auth`}
+>
   <a class="back" href={withBase('/')}>← All apps</a>
 
   <header class="app-head">
