@@ -3,6 +3,14 @@ declare module 'node:fs' {
   export function readdirSync(path: string): string[];
 }
 
+declare module 'node:crypto' {
+  export function createHash(algorithm: string): {
+    update(data: string): {
+      digest(encoding: 'hex'): string;
+    };
+  };
+}
+
 declare module 'node:path' {
   const path: {
     join(...parts: string[]): string;
@@ -13,4 +21,5 @@ declare module 'node:path' {
 
 declare const process: {
   cwd(): string;
+  env: Record<string, string | undefined>;
 };

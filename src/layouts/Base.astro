@@ -1,4 +1,5 @@
 ---
+import { createHash } from 'node:crypto';
 import { withBase } from '../lib/url';
 
 interface Props {
@@ -7,6 +8,8 @@ interface Props {
 }
 
 const { title, description = 'A single showcase for teaching materials produced by UZH - Chair of Sustainable Operations Management.' } = Astro.props;
+const password = process.env.APP_HUB_PASSWORD ?? '';
+const passwordHash = password ? createHash('sha256').update(password).digest('hex') : '';
 ---
 
 <!doctype html>
@@ -16,8 +19,27 @@ const { title, description = 'A single showcase for teaching materials produced 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <script is:inline>
+      try {
+        if (localStorage.getItem('app-hub-auth') === 'ok') {
+          document.documentElement.classList.add('auth-ok');
+        }
+      } catch {
+        // Keep the gate visible when browser storage is unavailable.
+      }
+    </script>
   </head>
   <body>
+    <section class="password-gate" aria-label="Password required">
+      <form class="password-card" data-password-form data-password-hash={passwordHash}>
+        <h1>App Hub</h1>
+        <label for="site-password">Password</label>
+        <input id="site-password" name="password" type="password" autocomplete="current-password" required />
+        <p class="password-error" data-password-error hidden>Wrong password.</p>
+        <button class="btn btn-primary" type="submit">Enter</button>
+      </form>
+    </section>
+
     <header class="site-header">
       <a class="brand" href={withBase('/')}>
         <span class="brand-mark">◆</span>
@@ -35,6 +57,41 @@ const { title, description = 'A single showcase for teaching materials produced 
     <footer class="site-footer">
       <p>© {new Date().getFullYear()} App Hub — UZH - Chair of Sustainable Operations Management</p>
     </footer>
+
+    <script is:inline>
+      const form = document.querySelector('[data-password-form]');
+      const input = document.querySelector('#site-password');
+      const error = document.querySelector('[data-password-error]');
+
+      form?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!(input instanceof HTMLInputElement) || !(error instanceof HTMLElement)) return;
+
+        const expectedHash = form instanceof HTMLFormElement ? form.dataset.passwordHash : '';
+        const actualHash = await sha256(input.value);
+
+        if (expectedHash && actualHash === expectedHash) {
+          try {
+            localStorage.setItem('app-hub-auth', 'ok');
+          } catch {
+            // Opening the current page is enough if browser storage is unavailable.
+          }
+          document.documentElement.classList.add('auth-ok');
+          error.hidden = true;
+          return;
+        }
+
+        error.hidden = false;
+        input.value = '';
+        input.focus();
+      });
+
+      async function sha256(value) {
+        const data = new TextEncoder().encode(value);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+      }
+    </script>
 
     <style is:global>
       :root {
@@ -73,6 +130,67 @@ const { title, description = 'A single showcase for teaching materials produced 
       a {
         color: inherit;
         text-decoration: none;
+      }
+
+      html:not(.auth-ok) .site-header,
+      html:not(.auth-ok) main,
+      html:not(.auth-ok) .site-footer {
+        display: none;
+      }
+
+      html.auth-ok .password-gate {
+        display: none;
+      }
+
+      .password-gate {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        width: 100%;
+        min-height: 100vh;
+        padding: 1.25rem;
+      }
+
+      .password-card {
+        width: min(100%, 340px);
+        display: grid;
+        gap: 0.75rem;
+        padding: 1.5rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+      }
+
+      .password-card h1 {
+        margin: 0 0 0.35rem;
+        font-size: 1.5rem;
+      }
+
+      .password-card label {
+        color: var(--text-dim);
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .password-card input {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--bg-soft);
+        color: var(--text);
+        font: inherit;
+        padding: 0.7rem 0.8rem;
+      }
+
+      .password-card input:focus {
+        outline: 2px solid #5b8cff66;
+        border-color: var(--accent);
+      }
+
+      .password-error {
+        margin: 0;
+        color: #f87171;
+        font-size: 0.9rem;
       }
 
       main {
