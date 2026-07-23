@@ -205,7 +205,7 @@ Demand during the wait can turn into lost sales, so every order trades off servi
 | newsvendor | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
 | tne-case | build | Build Guide (README_BUILD) | https://github.com/TNE-CASE/TGE_CASE-web-page/blob/main/README_BUILD.md |
 | tne-case | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
-| order-up-to | admin | Admin Guide (.pdf) | /apps/order-up-to/guides/admin-guide.pdf |
+| order-up-to | admin | Admin Guide (.pdf) | `<<PENDING: drop the PDF at public/apps/order-up-to/guides/admin-guide.pdf, then add this row back to guides.json>>` |
 
 > Note: `repo` is not a separate table — it's the `repo` column in the Apps table. It's added
 > automatically on the detail page as "Source code (repo)".

@@ -19,13 +19,6 @@
     "type": "admin",
     "label": "Admin Guide (.pdf)",
     "url": "/apps/arya-phones/guides/admin-guide.pdf"
-  },
-  {
-    "id": "order-up-to-admin",
-    "app": "order-up-to",
-    "type": "admin",
-    "label": "Admin Guide (.pdf)",
-    "url": "/apps/order-up-to/guides/admin-guide.pdf"
   }
 
 ]
