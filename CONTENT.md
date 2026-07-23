@@ -34,7 +34,7 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 | tne-case | TNE Case (TGECase) | Demand & scenario simulation desktop app | A Streamlit-based, packaged desktop simulation/optimization application. | Simulation / Optimization | live | false | 2 | #34d399 | https://github.com/TNE-CASE/TGE_CASE-web-page |
 | arya-phones | Arya Phones — Supplier Selection Game | Multiplayer classroom supplier-selection simulation | Competing teams pick smartphone-component suppliers to maximize profit or utility under environmental and social risk caps, while a facilitator runs live rounds. | Simulation Game | down | false | 3 | #ef4444 | https://github.com/aydinarda/AryaPhoneSupp |
 | green-tech-transition | Green Tech Transition Game | Multiplayer classroom green-investment simulation | Teams decide how much to invest in green capacity against uncertain green demand, balancing under-investment (lost customers) against over-investment (wasted capacity), while a facilitator runs live rounds. | Simulation Game | down | false | 4 | #16a34a | https://github.com/aydinarda/SimpleGreenTechTransition |
-| order-up-to | Order-Up-To Inventory Game | Multiplayer classroom order-up-to (base-stock) simulation with lead time | Players set an order-up-to level each round; lead-time delays cause lost sales, and order frequency drives CO₂ emissions. | Simulation Game | preparation | false | 5 | #818cf8 | _(none yet)_ |
+| order-up-to | Order-Up-To Inventory Game | Black Sea Gold — the multiplayer hazelnut supply challenge | Players restock a city hub each round via slow, cheap trucks or fast, costly vans — balancing service, profit and CO₂ under lead-time delays. | Simulation Game | live | false | 5 | #818cf8 | _(none yet)_ |
 
 **Long descriptions** (each app's detail-page body — Markdown). These don't fit in a table cell, so they live in their own blocks:
 
@@ -130,22 +130,30 @@ game round by round.
 <details><summary><code>order-up-to</code> — long description</summary>
 
 ```markdown
-> **In preparation.** This game is being designed — the card is a placeholder while requirements
-> and documentation are written. Check back soon.
+A multiplayer **order-up-to (base-stock)** inventory simulation, themed as **Black Sea Gold — The
+Hazelnut Supply Challenge**. Run the cooperative's city hub through the autumn season: keep the
+shelves stocked with premium hazelnuts while holding down transport emissions and excess inventory.
+It's the multi-period sibling of the Newsvendor game, built for classroom use.
 
-A multiplayer **order-up-to (base-stock)** inventory simulation — the multi-period sibling of the
-Newsvendor game. Each round students set an **order-up-to level S**; the system replenishes up to
-that level, but new stock only arrives after a **lead time**, so demand during the wait can turn
-into **lost sales**. On top of profit, each shipment carries a **CO₂ cost** — order often for high
-service, or batch orders to cut emissions.
+Each round you decide how to replenish using two shipment modes:
+- Consolidated truck — cheaper, lower-emission and higher-capacity, but it only arrives after the
+  configured lead time.
+- Express van — arrives next round with less capacity, at a higher cost and higher CO₂ per unit.
 
-### How it will work
-1. The admin sets lead time, demand, and cost/CO₂ parameters; students join.
-2. Each round, players set their **order-up-to level S** given on-hand and in-transit stock.
-3. Demand is realized; unmet demand is **lost**; replenishment arrives after the **lead time**.
-4. Profit and **CO₂ emissions** update; the leaderboard ranks players round by round.
+Demand during the wait can turn into lost sales, so every order trades off service level, profit and CO₂.
 
-### Tech (planned)
+### How to play
+1. The admin creates an active game with the admin key, picks the number of rounds, and shares the
+   link; students join with a nickname.
+2. The admin sets parameters — demand distribution, lead time, price, unit/holding costs, truck & van
+   capacities and costs, CO₂ per shipment, and shipping-delay chance — and can broadcast announcements.
+3. Each round players see on-hand stock and in-transit shipments, then order via consolidated trucks
+   and/or express vans. (The opening order always has lead time 1, so play effectively starts in round 2.)
+4. The admin ends the round → realized demand, profit, service level, lost sales and CO₂ update.
+5. The leaderboard ranks players; to win you must finish on the Pareto front — not beaten on both
+   profit and CO₂ by anyone.
+
+### Tech
 - Frontend: React + Vite
 - Backend: Express + WebSocket
 - Persistence (optional): Supabase PostgreSQL
@@ -167,6 +175,7 @@ service, or batch orders to cut emissions.
 | tne-case | windows | `<<FILL: Releases .exe link — build the installer first>>` | | Installer (.exe) | |
 | arya-phones | web | https://aryaphonesupp.onrender.com | | Temporarily offline — hosted instance is currently down | |
 | green-tech-transition | web | https://simplegreentechtransition.onrender.com | | Temporarily offline — hosted instance is currently down | |
+| order-up-to | web | https://order-up-to.onrender.com/ | | | |
 
 ---
 
@@ -181,6 +190,7 @@ service, or batch orders to cut emissions.
 | newsvendor | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
 | tne-case | build | Build Guide (README_BUILD) | https://github.com/TNE-CASE/TGE_CASE-web-page/blob/main/README_BUILD.md |
 | tne-case | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
+| order-up-to | admin | Admin Guide (.pdf) | /apps/order-up-to/guides/admin-guide.pdf |
 
 > Note: `repo` is not a separate table — it's the `repo` column in the Apps table. It's added
 > automatically on the detail page as "Source code (repo)".

@@ -35,6 +35,13 @@
     "platform": "web",
     "url": "https://simplegreentechtransition.onrender.com",
     "note": "Temporarily offline"
+  },
+
+  {
+    "id": "order-up-to-web",
+    "app": "order-up-to",
+    "platform": "web",
+    "url": "https://order-up-to.onrender.com/"
   }
 
 ]
