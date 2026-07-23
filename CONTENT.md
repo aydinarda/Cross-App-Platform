@@ -35,6 +35,7 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 | arya-phones | Arya Phones — Supplier Selection Game | Multiplayer classroom supplier-selection simulation | Competing teams pick smartphone-component suppliers to maximize profit or utility under environmental and social risk caps, while a facilitator runs live rounds. | Simulation Game | down | false | 3 | #ef4444 | https://github.com/aydinarda/AryaPhoneSupp |
 | green-tech-transition | Green Tech Transition Game | Multiplayer classroom green-investment simulation | Teams decide how much to invest in green capacity against uncertain green demand, balancing under-investment (lost customers) against over-investment (wasted capacity), while a facilitator runs live rounds. | Simulation Game | down | false | 4 | #16a34a | https://github.com/aydinarda/SimpleGreenTechTransition |
 | order-up-to | Order-Up-To Inventory Game | Black Sea Gold — the multiplayer hazelnut supply challenge | Players restock a city hub each round via slow, cheap trucks or fast, costly vans — balancing service, profit and CO₂ under lead-time delays. | Simulation Game | live | false | 5 | #818cf8 | _(none yet)_ |
+| cap-and-trade | Carbon Cap & Trade Game | Multiplayer classroom cap-and-trade carbon market simulation | Students run companies under an emission cap; the instructor allocates allowances and the class trades carbon credits in a live market across game years. | Simulation Game | preparation | false | 6 | #0d9488 | _(none yet)_ |
 
 **Long descriptions** (each app's detail-page body — Markdown). These don't fit in a table cell, so they live in their own blocks:
 
@@ -124,6 +125,20 @@ game round by round.
 - Hosting: Render (free tier)
 
 > The hosted instance is temporarily offline (status: down).
+```
+</details>
+
+<details><summary><code>cap-and-trade</code> — long description</summary>
+
+```markdown
+**Carbon Cap & Trade Game** is a real-time multiplayer cap-and-trade carbon simulation for the
+classroom. Students run companies in an industry they pick at join (a ten-year emission history is
+generated for that industry); the instructor allocates emission allowances under a cap mechanism and
+steps the class through game years: cap stage (regulator sale) → emission reveal → student market →
+penalty settlement.
+
+> In preparation — announced, not yet published. This page marks that the game exists; the hosted
+> instance and downloads will be added once it's deployed.
 ```
 </details>
 
