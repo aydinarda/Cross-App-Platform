@@ -35,7 +35,7 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 | arya-phones | Arya Phones — Supplier Selection Game | Multiplayer classroom supplier-selection simulation | Competing teams pick smartphone-component suppliers to maximize profit or utility under environmental and social risk caps, while a facilitator runs live rounds. | Simulation Game | down | false | 3 | #ef4444 | https://github.com/aydinarda/AryaPhoneSupp |
 | green-tech-transition | Green Tech Transition Game | Multiplayer classroom green-investment simulation | Teams decide how much to invest in green capacity against uncertain green demand, balancing under-investment (lost customers) against over-investment (wasted capacity), while a facilitator runs live rounds. | Simulation Game | down | false | 4 | #16a34a | https://github.com/aydinarda/SimpleGreenTechTransition |
 | order-up-to | Order-Up-To Inventory Game | Black Sea Gold — the multiplayer hazelnut supply challenge | Players restock a city hub each round via slow, cheap trucks or fast, costly vans — balancing service, profit and CO₂ under lead-time delays. | Simulation Game | live | false | 5 | #818cf8 | _(none yet)_ |
-| cap-and-trade | Carbon Cap & Trade Game | Multiplayer classroom cap-and-trade carbon market simulation | Students run companies under an emission cap; the instructor allocates allowances and the class trades carbon credits in a live market across game years. | Simulation Game | preparation | false | 6 | #0d9488 | _(none yet)_ |
+| cap-and-trade | Carbon Cap & Trade Game | Multiplayer classroom cap-and-trade carbon market simulation | Students run companies under an emission cap; the instructor allocates allowances and the class trades carbon credits in a live market across game years. | Simulation Game | live | false | 6 | #0d9488 | https://github.com/aydinarda/Carb-Cap-Trade-Game |
 
 **Long descriptions** (each app's detail-page body — Markdown). These don't fit in a table cell, so they live in their own blocks:
 
@@ -134,11 +134,48 @@ game round by round.
 **Carbon Cap & Trade Game** is a real-time multiplayer cap-and-trade carbon simulation for the
 classroom. Students run companies in an industry they pick at join (a ten-year emission history is
 generated for that industry); the instructor allocates emission allowances under a cap mechanism and
-steps the class through game years: cap stage (regulator sale) → emission reveal → student market →
-penalty settlement.
+steps the class through game years: cap stage (allocation or auction) → emission reveal → student
+market → penalty settlement.
 
-> In preparation — announced, not yet published. This page marks that the game exists; the hosted
-> instance and downloads will be added once it's deployed.
+Prices are not set by the game — they come entirely from the students' own order book, with the
+penalty rate acting as the ceiling.
+
+### Cap mechanisms
+- **Grandfathering** — free credits proportional to each company's emission history; the cap is 80%
+  of the class baseline.
+- **Benchmarking** — every company in a sector gets the same free credits, set 40% below the sector
+  average, tightening each year. No primary sale: close the gap by cutting emissions or on the market.
+- **Auctioning** — no free credits; a single-round sealed-bid uniform-price auction sells a supply
+  that shrinks each year.
+
+The instructor can switch the mechanism in the lobby and between years, so one class can compare all
+three on the same roster.
+
+### How to play
+1. The instructor opens `/host`, picks the cap mechanism, enters the host key and creates a session.
+2. Students join at the site root with the 4-letter room code and pick an industry — that draws
+   their ten-year emission history.
+3. **Start Year 11** locks the roster and allocates free credits.
+4. **Cap stage** — under auctioning students submit a sealed bid (quantity + max price); under the
+   other two there is nothing to submit, the panel just shows the allocation and the gap it leaves.
+5. **Open the market** — students post limit buy/sell orders and the book matches them live.
+6. **Close market & settle** — emissions are realized, uncovered tonnes are charged the penalty rate,
+   surpluses are banked, and the leaderboard updates.
+7. Repeat for the next year, or end the game for the final leaderboard.
+
+Each company also chooses how much to abate against its sector's marginal abatement cost curve —
+optimal play is where marginal cost meets the carbon price. Scores are cumulative costs, and the
+leaderboard ranks players by distance from their own optimum, so it measures skill rather than which
+industry they drew.
+
+### Tech
+- **Frontend:** React + Vite
+- **Backend:** Express + Socket.IO
+- **Deploy:** split frontend (static site) + backend (web service) on Render
+
+All game logic runs server-side; clients render role-scoped snapshots, so players never see others'
+private numbers or unrevealed emissions. Optional market bots (compliance, market maker, speculator,
+noise) can be added in the lobby to keep the order book two-sided in a small class.
 ```
 </details>
 
@@ -191,6 +228,7 @@ Demand during the wait can turn into lost sales, so every order trades off servi
 | arya-phones | web | https://aryaphonesupp.onrender.com | | Temporarily offline — hosted instance is currently down | |
 | green-tech-transition | web | https://simplegreentechtransition.onrender.com | | Temporarily offline — hosted instance is currently down | |
 | order-up-to | web | https://order-up-to.onrender.com/ | | | |
+| cap-and-trade | web | https://carb-cap-trade-game.onrender.com | | Instructor screen: /host | |
 
 ---
 
@@ -205,7 +243,9 @@ Demand during the wait can turn into lost sales, so every order trades off servi
 | newsvendor | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
 | tne-case | build | Build Guide (README_BUILD) | https://github.com/TNE-CASE/TGE_CASE-web-page/blob/main/README_BUILD.md |
 | tne-case | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
+| arya-phones | admin | Admin Guide (.pdf) | /apps/arya-phones/guides/admin-guide.pdf |
 | order-up-to | admin | Admin Guide (.pdf) | /apps/order-up-to/guides/admin-guide.pdf |
+| cap-and-trade | admin | Admin Guide (.docx) | /apps/cap-and-trade/guides/admin-guide.docx |
 
 > Note: `repo` is not a separate table — it's the `repo` column in the Apps table. It's added
 > automatically on the detail page as "Source code (repo)".

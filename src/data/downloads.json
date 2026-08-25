@@ -42,6 +42,14 @@
     "app": "order-up-to",
     "platform": "web",
     "url": "https://order-up-to.onrender.com/"
+  },
+
+  {
+    "id": "cap-and-trade-web",
+    "app": "cap-and-trade",
+    "platform": "web",
+    "url": "https://carb-cap-trade-game.onrender.com",
+    "note": "Instructor screen: /host"
   }
 
 ]

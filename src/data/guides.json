@@ -26,6 +26,13 @@
     "type": "admin",
     "label": "Admin Guide (.pdf)",
     "url": "/apps/order-up-to/guides/admin-guide.pdf"
+  },
+  {
+    "id": "cap-and-trade-admin",
+    "app": "cap-and-trade",
+    "type": "admin",
+    "label": "Admin Guide (.docx)",
+    "url": "/apps/cap-and-trade/guides/admin-guide.docx"
   }
 
 ]
