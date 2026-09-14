@@ -6,10 +6,13 @@ interface Props {
   app: CollectionEntry<'apps'>;
   platforms?: string[]; // platform keys present in the downloads table for this app
   logo?: string; // logo path, auto-discovered from public/apps/<id>/
+  status?: CollectionEntry<'apps'>['data']['status']; // default version's status (versioned apps)
+  versionCount?: number; // number of visible versions; a chip is shown when > 1
 }
 
-const { app, platforms = [], logo } = Astro.props;
+const { app, platforms = [], logo, status: versionStatus, versionCount = 0 } = Astro.props;
 const { data } = app;
+const status = versionStatus ?? data.status;
 
 const platformLabels: Record<string, string> = {
   web: 'Web',
@@ -29,7 +32,7 @@ const available = [...new Set(platforms)];
         <div class="card-logo card-logo--placeholder">{data.title.charAt(0)}</div>
       )
     }
-    <span class={`badge badge-${data.status}`}>{data.status}</span>
+    <span class={`badge badge-${status}`}>{status}</span>
   </div>
 
   <h3 class="card-title">{data.title}</h3>
@@ -39,12 +42,17 @@ const available = [...new Set(platforms)];
   <div class="card-meta">
     {data.category && <span class="card-cat">{data.category}</span>}
     <span class="card-platforms">
+      {versionCount > 1 && <span class="chip chip-versions">{versionCount} versions</span>}
       {available.map((p) => <span class="chip">{platformLabels[p] ?? p}</span>)}
     </span>
   </div>
 </a>
 
 <style>
+  .chip-versions {
+    color: var(--text);
+    border-color: var(--card-accent);
+  }
   .card {
     --card-accent: var(--accent);
     display: flex;

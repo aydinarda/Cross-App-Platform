@@ -7,6 +7,7 @@ import {
   distDir,
   readApps,
   readBasePath,
+  readVersions,
   relative,
   walkFiles,
 } from '../utils/project.js';
@@ -29,6 +30,22 @@ test('build output contains only non-draft app routes', {
       assert.ok(!existsSync(routePath), `${app.id} is draft and must not produce a route`);
     } else {
       assertFileExists(routePath, `${app.id} route build output`);
+    }
+  }
+});
+
+test('build output contains only non-draft version routes', {
+  skip: !distExists && 'Run pnpm build first',
+}, () => {
+  const draftAppIds = new Set(readApps().filter((app) => app.draft).map((app) => app.id));
+
+  for (const version of readVersions()) {
+    const routePath = path.join(distDir, 'apps', version.appDir, version.slug, 'index.html');
+
+    if (version.draft || draftAppIds.has(version.appDir)) {
+      assert.ok(!existsSync(routePath), `${version.id} is hidden and must not produce a route`);
+    } else {
+      assertFileExists(routePath, `${version.id} route build output`);
     }
   }
 });

@@ -9,6 +9,7 @@
   {
     "id": "tne-case-build",
     "app": "tne-case",
+    "version": "tne-case/desktop",
     "type": "build",
     "label": "Build Guide (README_BUILD)",
     "url": "https://github.com/TNE-CASE/TGE_CASE-web-page/blob/main/README_BUILD.md"

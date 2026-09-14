@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import AppCard from '../components/AppCard.astro';
 import { getLogo } from '../lib/media';
+import { getDefaultVersion, getVersionsByApp } from '../lib/versions';
 
 const apps = (await getCollection('apps'))
   .filter((a) => !a.data.draft) // hide drafts
@@ -11,10 +12,14 @@ const apps = (await getCollection('apps'))
     return a.data.order - b.data.order;
   });
 
+const versionsByApp = await getVersionsByApp();
+const visibleVersionIds = new Set([...versionsByApp.values()].flat().map((v) => v.id));
+
 // Join the downloads table → which platforms each app offers (for the card chips).
 const downloads = await getCollection('downloads');
 const platformsByApp = new Map<string, string[]>();
 for (const d of downloads) {
+  if (d.data.version && !visibleVersionIds.has(d.data.version.id)) continue; // row of a draft version
   const key = d.data.app.id;
   platformsByApp.set(key, [...(platformsByApp.get(key) ?? []), d.data.platform]);
 }
@@ -29,9 +34,18 @@ for (const d of downloads) {
 
   <section class="grid">
     {
-      apps.map((app) => (
-        <AppCard app={app} platforms={platformsByApp.get(app.id) ?? []} logo={getLogo(app.id)} />
-      ))
+      apps.map((app) => {
+        const versions = versionsByApp.get(app.id) ?? [];
+        return (
+          <AppCard
+            app={app}
+            platforms={platformsByApp.get(app.id) ?? []}
+            logo={getLogo(app.id)}
+            status={getDefaultVersion(versions)?.data.status}
+            versionCount={versions.length}
+          />
+        );
+      })
     }
   </section>
 

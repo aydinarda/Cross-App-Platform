@@ -1,12 +1,13 @@
 # CONTENT — editing surface (separate tables)
 
-The data is **normalized** into separate tables. Edit the **4 tables** below and hand the file back;
+The data is **normalized** into separate tables. Edit the **5 tables** below and hand the file back;
 the values get transferred into the matching collection files. The tables are linked by `app` (= app id) —
-i.e. each download / guide / stat row belongs to the app whose `id` it carries (a foreign key).
+i.e. each version / download / guide / stat row belongs to the app whose `id` it carries (a foreign key).
 
 | Table | File | One row = |
 |---|---|---|
 | **Apps** | `src/content/apps/<id>.md` | an app (base fields + long description) |
+| **Versions** | `src/content/versions/<id>/<slug>.md` | an optional parallel edition of an app |
 | **Downloads** | `src/data/downloads.json` | one app+platform download/play link |
 | **Guides** | `src/data/guides.json` | one guide / resource |
 | **Stats** | `src/data/stats.json` | one exposed statistic |
@@ -17,6 +18,8 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 **Rules**
 - Leave unknown values as `<<FILL: ...>>`. Delete rows that don't apply (don't leave blank rows).
 - The `app` column must **exactly** match an `id` in the Apps table.
+- The `version` column is optional. Leave it empty for rows shared by the whole app; otherwise it must
+  **exactly** match an `id` in the Versions table (`<app>/<slug>`, e.g. `tne-case/uzh`).
 - Put guides under `public/apps/<id>/guides/` (or hand them to me and I'll place them).
 - For large `.app`/`.exe`/`.zip`, upload to GitHub Releases and put only the link in Downloads.
 
@@ -26,12 +29,13 @@ i.e. each download / guide / stat row belongs to the app whose `id` it carries (
 
 > Base info. `status`: live | beta | wip | down (= temporarily offline, red badge) | preparation (= announced, not built yet, indigo badge) · `featured`: true|false · `order`: smaller = first · `accent`: hex color.
 > (No logo column — the logo is auto-loaded from `public/apps/<id>/logo.png`.)
-> To **hide** an app, add `draft: true` to its `src/content/apps/<id>.md` frontmatter (no card, no page). Currently: `tne-case` is hidden.
+> To **hide** an app, add `draft: true` to its `src/content/apps/<id>.md` frontmatter (no card, no page).
+> Apps with **versions** (Table 1b) show the default version's status on the card, and `repo` lives on each version.
 
 | id | title | tagline | description | category | status | featured | order | accent | repo |
 |----|-------|---------|-------------|----------|--------|----------|-------|--------|------|
 | newsvendor | Simple Newsvendor Game | Multiplayer in-class inventory (newsvendor) simulation | Students place orders against a shared random demand; an admin runs the game round by round. | Simulation Game | live | true | 1 | #5b8cff | https://github.com/aydinarda/SimpleNewsVendorGame |
-| tne-case | TNE Case (TGECase) | Demand & scenario simulation desktop app | A Streamlit-based, packaged desktop simulation/optimization application. | Simulation / Optimization | live | false | 2 | #34d399 | https://github.com/TNE-CASE/TGE_CASE-web-page |
+| tne-case | TNE Case | Global supply-chain network design case — cost vs. CO₂ | Students design a global supply-chain network across the SC1/SC2 scenarios, balancing total cost against CO₂ emissions. | Simulation / Optimization | live | false | 2 | #34d399 | _(per version)_ |
 | arya-phones | Arya Phones — Supplier Selection Game | Multiplayer classroom supplier-selection simulation | Competing teams pick smartphone-component suppliers to maximize profit or utility under environmental and social risk caps, while a facilitator runs live rounds. | Simulation Game | down | false | 3 | #ef4444 | https://github.com/aydinarda/AryaPhoneSupp |
 | green-tech-transition | Green Tech Transition Game | Multiplayer classroom green-investment simulation | Teams decide how much to invest in green capacity against uncertain green demand, balancing under-investment (lost customers) against over-investment (wasted capacity), while a facilitator runs live rounds. | Simulation Game | down | false | 4 | #16a34a | https://github.com/aydinarda/SimpleGreenTechTransition |
 | order-up-to | Order-Up-To Inventory Game | Black Sea Gold — the multiplayer hazelnut supply challenge | Players restock a city hub each round via slow, cheap trucks or fast, costly vans — balancing service, profit and CO₂ under lead-time delays. | Simulation Game | live | false | 5 | #818cf8 | _(none yet)_ |
@@ -58,20 +62,12 @@ orders against a shared, randomized demand; an admin advances the game one round
 ```
 </details>
 
-<details><summary><code>tne-case</code> — long description</summary>
+<details><summary><code>tne-case</code> — long description (shared overview, shown on every version)</summary>
 
 ```markdown
-**TNE Case (TGECase)** — a simulation/optimization desktop app built with Streamlit and packaged
-with PyInstaller as a macOS `.app` and a Windows installer.
-
-### Scenarios
-- SC1 / SC2 demand-level simulations
-- Optimization module (`optimize/`)
-- Single-page run mode
-
-### Download & install
-The macOS build is compiled for Apple Silicon; after unzipping, run `TNECase.app`. For Windows,
-download the installer `.exe` from the Releases page.
+**TNE Case** is a supply-chain network design case: choose facilities, allocate production and pick
+transport modes to meet global demand at the lowest total cost and CO₂. It comes in parallel
+**editions** — pick one with the tabs above.
 ```
 </details>
 
@@ -214,21 +210,85 @@ Demand during the wait can turn into lost sales, so every order trades off servi
 
 ---
 
+## TABLE 1b — Versions
+
+> Optional — only for apps that ship **parallel editions** at the same time. Apps without rows here are unaffected.
+> `id` = `<app>/<slug>` (file `src/content/versions/<app>/<slug>.md`, page `/apps/<app>/<slug>`) ·
+> `label` = tab name · `default`: exactly one `true` per app (shown at `/apps/<app>` and on the card) ·
+> `order`: tab order · `tagline` / `status` / `repo` override the app's · `draft: true` hides the version.
+
+| id | app | label | tagline | status | default | order | repo | draft |
+|----|-----|-------|---------|--------|---------|-------|------|-------|
+| tne-case/uzh | tne-case | UZH Edition | Web-native multiplayer puzzle with class rooms and a live leaderboard | live | true | 1 | https://github.com/TNE-CASE/TNEv2-web | true _(until the live URL is added)_ |
+| tne-case/desktop | tne-case | Desktop | Streamlit + Gurobi optimization suite, packaged as a desktop app | preparation | false | 2 | https://github.com/TNE-CASE/TGE_CASE-web-page | false |
+
+**Version long descriptions** (shown below the app's shared overview):
+
+<details><summary><code>tne-case/uzh</code> — long description</summary>
+
+```markdown
+The **UZH Edition** (Supply-Chain Puzzle) is a web-native, multiplayer version of the TNE Case.
+Players join a room with a **class code**, build a supply-chain network — facilities, production
+allocation and transport modes — to satisfy **111,000 units** of demand at the lowest **cost and
+CO₂**, and compete on a **live leaderboard**. It runs in the browser: no installation and no Gurobi
+license needed.
+
+### How to play
+1. The host creates a room (a room-creation code may be required) and shares the class code.
+2. Players join with the class code and a nickname.
+3. Each player builds a network and evaluates its cost and CO₂.
+4. Submissions appear on the live leaderboard; players iterate to improve their trade-off.
+
+### Host view
+- Per-player best submissions and summaries
+- Pareto front of cost vs. CO₂ across the class
+- Read-only SC1 / SC2 dashboards served from precomputed results
+
+### Tech
+- Backend: FastAPI + WebSocket, SQLAlchemy (Postgres), pandas / pyarrow
+- Frontend: React + Vite + TypeScript, Plotly
+- Deploy: Render (static frontend + Python web service + Postgres)
+```
+</details>
+
+<details><summary><code>tne-case/desktop</code> — long description</summary>
+
+```markdown
+The **Desktop** edition (TGECase) is the original single-user Streamlit application with a Gurobi
+optimization engine, packaged with PyInstaller for macOS and Windows.
+
+### Scenarios
+- **SC1 / SC2** demand-level simulations
+- Optimization module (`optimize/`)
+- Single-page run mode
+
+### Download & install
+Builds are distributed as `.zip` files for macOS (Apple Silicon) and Windows. After unzipping, run
+`TNECase.app` on macOS or the `TNECase` executable on Windows.
+
+> Large binaries are not kept in the repo; every release is distributed via **GitHub Releases**.
+```
+</details>
+
+---
+
 ## TABLE 2 — Downloads
 
 > One row per download/play button. `platform`: web | macos | windows | linux ·
 > `web` → "Play in Browser" link, desktop → download link (Releases).
-> `note` / `size` / `version` = small text under the button (optional).
+> `version` = which edition the row belongs to (empty = shared by the whole app).
+> `note` / `size` / `release` = small text under the button (optional; `release` is a build number, shown as `v1.2.0`).
 
-| app | platform | url | size | note | version |
-|-----|----------|-----|------|------|---------|
-| newsvendor | web | `<<FILL: live Render URL, e.g. https://newsvendor.onrender.com>>` | | | |
-| tne-case | macos | `<<FILL: Releases .zip link>>` | 175 MB | Apple Silicon (.app) | |
-| tne-case | windows | `<<FILL: Releases .exe link — build the installer first>>` | | Installer (.exe) | |
-| arya-phones | web | https://aryaphonesupp.onrender.com | | Temporarily offline — hosted instance is currently down | |
-| green-tech-transition | web | https://simplegreentechtransition.onrender.com | | Temporarily offline — hosted instance is currently down | |
-| order-up-to | web | https://order-up-to.onrender.com/ | | | |
-| cap-and-trade | web | https://carb-cap-trade-game.onrender.com | | Instructor screen: /host | |
+| app | version | platform | url | size | note | release |
+|-----|---------|----------|-----|------|------|---------|
+| newsvendor | | web | `<<FILL: live Render URL, e.g. https://newsvendor.onrender.com>>` | | | |
+| tne-case | tne-case/uzh | web | `<<FILL: live scp-frontend Render URL>>` | | | |
+| tne-case | tne-case/desktop | macos | `<<FILL: Releases .zip link>>` | 175 MB | Apple Silicon (.zip) | |
+| tne-case | tne-case/desktop | windows | `<<FILL: Releases .zip link>>` | 200 MB | Windows (.zip) | |
+| arya-phones | | web | https://aryaphonesupp.onrender.com | | Temporarily offline — hosted instance is currently down | |
+| green-tech-transition | | web | https://simplegreentechtransition.onrender.com | | Temporarily offline — hosted instance is currently down | |
+| order-up-to | | web | https://order-up-to.onrender.com/ | | | |
+| cap-and-trade | | web | https://carb-cap-trade-game.onrender.com | | Instructor screen: /host | |
 
 ---
 
@@ -236,18 +296,19 @@ Demand during the wait can turn into lost sales, so every order trades off servi
 
 > One row per guide/resource. `type`: admin | user | build | other.
 > `url` is either `/apps/<id>/guides/...` (local file) or an external link.
+> `version` = which edition the guide belongs to (empty = shared by the whole app).
 
-| app | type | label | url |
-|-----|------|-------|-----|
-| newsvendor | admin | Admin Guide (.docx) | /apps/newsvendor/guides/admin-guide.docx |
-| newsvendor | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
-| tne-case | build | Build Guide (README_BUILD) | https://github.com/TNE-CASE/TGE_CASE-web-page/blob/main/README_BUILD.md |
-| tne-case | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
-| arya-phones | admin | Admin Guide (.pdf) | /apps/arya-phones/guides/admin-guide.pdf |
-| order-up-to | admin | Admin Guide (.pdf) | /apps/order-up-to/guides/admin-guide.pdf |
-| cap-and-trade | admin | Admin Guide (.docx) | /apps/cap-and-trade/guides/admin-guide.docx |
+| app | version | type | label | url |
+|-----|---------|------|-------|-----|
+| newsvendor | | admin | Admin Guide (.docx) | /apps/newsvendor/guides/admin-guide.docx |
+| newsvendor | | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
+| tne-case | tne-case/desktop | build | Build Guide (README_BUILD) | https://github.com/TNE-CASE/TGE_CASE-web-page/blob/main/README_BUILD.md |
+| tne-case | `<<FILL: tne-case/uzh or tne-case/desktop>>` | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
+| arya-phones | | admin | Admin Guide (.pdf) | /apps/arya-phones/guides/admin-guide.pdf |
+| order-up-to | | admin | Admin Guide (.pdf) | /apps/order-up-to/guides/admin-guide.pdf |
+| cap-and-trade | | admin | Admin Guide (.docx) | /apps/cap-and-trade/guides/admin-guide.docx |
 
-> Note: `repo` is not a separate table — it's the `repo` column in the Apps table. It's added
+> Note: `repo` is not a separate table — it's the `repo` column in the Apps (or Versions) table. It's added
 > automatically on the detail page as "Source code (repo)".
 
 ---
@@ -260,6 +321,8 @@ There is **no visuals table**. Logo and screenshots are auto-discovered from the
 - **Screenshots:** drop any images into `public/apps/<id>/screenshots/` → all shown in the gallery.
   - Sorted by filename. To control order, prefix with numbers: `01-home.png`, `02-start.png`, …
   - The caption is auto-derived from the filename (`01-Home-Page.png` → "Home Page").
+- **Per version (optional):** `public/apps/<id>/<slug>/logo.png` and `public/apps/<id>/<slug>/screenshots/`
+  replace the app's logo / screenshots on that version's page (e.g. `public/apps/tne-case/uzh/screenshots/`).
 
 Just add/remove files — nothing to edit here. (Filenames are case-sensitive on the live site.)
 
@@ -272,15 +335,16 @@ Just add/remove files — nothing to edit here. (Filenames are case-sensitive on
 > - **live** → the browser fetches `url` and reads `field` (a dot-path into the JSON) to update the value.
 >   The app must expose a **public, CORS-enabled** JSON endpoint (e.g. the newsvendor backend's `/health`
 >   or `/stats`). `value` is used as the fallback until the fetch returns. `suffix` is an optional unit.
+> `version` = which edition the stat belongs to (empty = shared by the whole app).
 
 > **Planned — none live yet.** `src/data/stats.json` is currently an empty `[]`. We'll add real
 > metrics here in the future (e.g. how many times an app was visited, how many users, games played,
 > etc.). Add a row below for each stat you want shown, then it gets transferred into `stats.json`.
 > (Reminder: `.json` can't hold comments — keep notes like this here in CONTENT.md, not in the data file.)
 
-| app | label | value | suffix | icon | source | url | field |
-|-----|-------|-------|--------|------|--------|-----|-------|
-| `<<FILL: app id>>` | `<<FILL: e.g. Visits>>` | `<<FILL>>` | | 📊 | static | | |
+| app | version | label | value | suffix | icon | source | url | field |
+|-----|---------|-------|-------|--------|------|--------|-----|-------|
+| `<<FILL: app id>>` | | `<<FILL: e.g. Visits>>` | `<<FILL>>` | | 📊 | static | | |
 
 > Reminder: the site is **static** (GitHub Pages), so it cannot count anything itself. `live` stats are
 > fetched **in the visitor's browser** at view time — only works if the app's endpoint is public + CORS-enabled.
@@ -290,8 +354,10 @@ Just add/remove files — nothing to edit here. (Filenames are case-sensitive on
 ## Adding a new app
 
 1. Add a new row to **Apps** (with a new `id`) and a long-description block under it.
-2. For that `id`, add the relevant rows to **Downloads / Guides / Stats**.
-3. Drop images into `public/apps/<id>/` (`logo.png` + `screenshots/*`) and guides into `guides/` — images auto-load.
+2. If the app has parallel editions, add one row per edition to **Versions** (mark one `default`) with
+   its own long-description block.
+3. For that `id`, add the relevant rows to **Downloads / Guides / Stats** (fill `version` for edition-specific rows).
+4. Drop images into `public/apps/<id>/` (`logo.png` + `screenshots/*`) and guides into `guides/` — images auto-load.
 
-Hand the file back and I'll transfer it into `src/content/apps/<id>.md` + `src/data/*.json`, then verify
-with `pnpm build`.
+Hand the file back and I'll transfer it into `src/content/apps/<id>.md`, `src/content/versions/<id>/*.md`
+and `src/data/*.json`, then verify with `pnpm build`.

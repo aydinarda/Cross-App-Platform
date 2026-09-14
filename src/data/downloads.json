@@ -1,18 +1,21 @@
 [
   {
-    "id": "tne-case-macos",
+    "id": "tne-case-desktop-macos",
     "app": "tne-case",
+    "version": "tne-case/desktop",
     "platform": "macos",
     "url": "https://github.com/TNE-CASE/TGE_CASE-web-page/releases",
     "size": "175 MB",
-    "note": "Apple Silicon (.app)"
+    "note": "Apple Silicon (.zip)"
   },
   {
-    "id": "tne-case-windows",
+    "id": "tne-case-desktop-windows",
     "app": "tne-case",
+    "version": "tne-case/desktop",
     "platform": "windows",
     "url": "https://github.com/TNE-CASE/TGE_CASE-web-page/releases",
-    "note": "Installer (.exe)"
+    "size": "200 MB",
+    "note": "Windows (.zip)"
   },
 
   { "id": "newsvendor-web",

@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { readdirSync, statSync } from 'node:fs';
+import path from 'node:path';
 import test from 'node:test';
 import {
   assertNonEmptyString,
@@ -7,8 +9,12 @@ import {
   isExternalUrl,
   readApps,
   readJsonArray,
+  readVersions,
+  reservedVersionSlugs,
+  versionsContentDir,
 } from '../utils/project.js';
 
+const urlFriendly = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const allowedPlatforms = new Set(['web', 'macos', 'windows', 'linux']);
 const allowedGuideTypes = new Set(['admin', 'user', 'build', 'other', undefined]);
 const allowedStatSources = new Set(['static', 'live', undefined]);
@@ -21,8 +27,56 @@ test('content app manifests expose stable ids and titles', () => {
   assert.equal(new Set(ids).size, ids.length, 'app ids must be unique');
 
   for (const app of apps) {
-    assert.match(app.id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, `${app.id} must be URL-friendly`);
+    assert.match(app.id, urlFriendly, `${app.id} must be URL-friendly`);
     assertNonEmptyString(app.title, `${app.id}.title`);
+  }
+});
+
+test('version manifests live in src/content/versions/<app-id>/<slug>.md', () => {
+  let entries = [];
+  try {
+    entries = readdirSync(versionsContentDir);
+  } catch {
+    return; // no versions yet
+  }
+
+  for (const name of entries) {
+    if (name.startsWith('.')) continue;
+    assert.ok(
+      statSync(path.join(versionsContentDir, name)).isDirectory(),
+      `src/content/versions/${name} must be an app folder, not a file`
+    );
+  }
+});
+
+test('version manifests belong to existing apps and use URL-friendly slugs', () => {
+  const appIds = new Set(readApps().map((app) => app.id));
+
+  for (const version of readVersions()) {
+    assert.ok(
+      appIds.has(version.appDir),
+      `src/content/versions/${version.appDir} has no matching app manifest`
+    );
+    assert.equal(version.app, version.appDir, `${version.id}.app must match its folder name`);
+    assert.match(version.slug, urlFriendly, `${version.id} slug must be URL-friendly`);
+    assert.ok(
+      !reservedVersionSlugs.has(version.slug),
+      `${version.id} uses a reserved slug (${[...reservedVersionSlugs].join(', ')})`
+    );
+    assertNonEmptyString(version.label, `${version.id}.label`);
+  }
+});
+
+test('each versioned app has at most one visible default version', () => {
+  const defaultsByApp = new Map();
+
+  for (const version of readVersions()) {
+    if (version.draft || !version.isDefault) continue;
+    defaultsByApp.set(version.appDir, [...(defaultsByApp.get(version.appDir) ?? []), version.id]);
+  }
+
+  for (const [appId, ids] of defaultsByApp) {
+    assert.ok(ids.length <= 1, `${appId} has more than one default version: ${ids.join(', ')}`);
   }
 });
 
@@ -48,6 +102,28 @@ test('data table app references point to existing app manifests', () => {
     rows.forEach((row, index) => {
       assertNonEmptyString(row.app, `${tableName}[${index}].app`);
       assert.ok(appIds.has(row.app), `${tableName}[${index}].app references an unknown app`);
+    });
+  }
+});
+
+test('data table version references point to versions of the same app', () => {
+  const versionIds = new Set(readVersions().map((version) => version.id));
+
+  for (const [tableName, filePath] of Object.entries(dataFiles)) {
+    const rows = readJsonArray(filePath);
+
+    rows.forEach((row, index) => {
+      if (row.version === undefined) return;
+
+      assertNonEmptyString(row.version, `${tableName}[${index}].version`);
+      assert.ok(
+        versionIds.has(row.version),
+        `${tableName}[${index}].version references an unknown version (expected "<app-id>/<slug>")`
+      );
+      assert.ok(
+        row.version.startsWith(`${row.app}/`),
+        `${tableName}[${index}].version must be a version of ${row.app}`
+      );
     });
   }
 });

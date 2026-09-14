@@ -16,9 +16,10 @@ duplicated downloads across projects. Install pnpm once with `npm i -g pnpm`.
 
 ```bash
 pnpm install
-pnpm dev      # http://localhost:4321/cross-app-platform/
+pnpm dev      # http://localhost:4321/Cross-App-Platform/
 pnpm build    # static output → dist/  (manifests validated with zod)
 pnpm preview  # serve the build output locally
+pnpm verify   # astro check + data tests + build + build-output tests
 ```
 
 > `pnpm-workspace.yaml` whitelists the native build scripts (`esbuild`, `sharp`) that Astro/Vite
@@ -28,11 +29,12 @@ pnpm preview  # serve the build output locally
 
 ## Data model
 
-The data is **normalized** into four separate collections, linked by an `app` reference (foreign key):
+The data is **normalized** into five separate collections, linked by an `app` reference (foreign key):
 
 | Collection | File | One row = |
 |---|---|---|
 | `apps` | `src/content/apps/<id>.md` | an app (base fields + long-description body) |
+| `versions` | `src/content/versions/<id>/<slug>.md` | an optional parallel edition of an app (base fields + version-specific body) |
 | `downloads` | `src/data/downloads.json` | one app+platform download/play link |
 | `guides` | `src/data/guides.json` | one guide / resource |
 | `stats` | `src/data/stats.json` | one exposed statistic (static, or live via a CORS endpoint) |
@@ -42,7 +44,22 @@ The data is **normalized** into four separate collections, linked by an `app` re
 - `public/apps/<id>/logo.png` → card + detail logo
 - `public/apps/<id>/screenshots/*` → detail-page gallery (sorted by filename; prefix `01-`, `02-` to control order)
 
-`CONTENT.md` is the human-friendly editing surface — the same four tables in Markdown. Edit there,
+### Versions (parallel editions)
+
+Some apps ship in several editions at the same time (e.g. TNE Case: a web **UZH Edition** and a
+**Desktop** edition). Versions are optional — apps without version files work exactly as before.
+
+- A version's id is `<app-id>/<slug>` (from its file path); its page is `/apps/<app-id>/<slug>`.
+  `/apps/<app-id>` shows the version marked `default: true` and the page has one tab per version.
+- `tagline`, `description`, `status` and `repo` on a version override the app's. The app body is a
+  shared overview; the version body is shown below it.
+- Rows in `downloads` / `guides` / `stats` with `"version": "<app-id>/<slug>"` only show on that version.
+  Rows without `version` are shared by all versions of the app.
+- Images: `public/apps/<app-id>/<slug>/logo.png` and `.../<slug>/screenshots/*` override the app's.
+- `draft: true` on a version hides its tab, its page and its rows.
+- A release number of a build goes in the download row's `release` field (shown as `v1.2.0`).
+
+`CONTENT.md` is the human-friendly editing surface — the same tables in Markdown. Edit there,
 then the values are transferred into the files above.
 
 ## How to add a new app
@@ -59,8 +76,17 @@ then the values are transferred into the files above.
    Releases page and only set the `url` in `downloads.json`.
 5. Check with `pnpm dev` — the card and detail page appear automatically.
 
-If a field is missing/invalid (e.g. a row references an unknown `app`), `pnpm build` fails
-(zod schema + references — see `src/content.config.ts`).
+If a field is missing/invalid, `pnpm verify` fails: `pnpm build` checks the zod schemas
+(`src/content.config.ts`), and `tests/data` checks that every `app` / `version` reference exists and that
+folders follow the conventions. `astro build` alone does **not** catch an unknown reference.
+
+### Adding versions to an app
+
+1. Copy `templates/version.template.md` to `src/content/versions/<id>/<slug>.md` for each edition
+   (`<slug>` must be url-friendly and not `guides` / `screenshots`). Set `app: <id>` and a `label`.
+2. Mark exactly one version `default: true`.
+3. On rows that belong to one edition only, add `"version": "<id>/<slug>"`.
+4. Optionally add `public/apps/<id>/<slug>/logo.png` and `screenshots/`.
 
 ---
 
@@ -68,22 +94,27 @@ If a field is missing/invalid (e.g. a row references an unknown `app`), `pnpm bu
 
 ```
 src/
-  content.config.ts      # 4 collections + zod schemas (apps, downloads, guides, screenshots)
+  content.config.ts      # 5 collections + zod schemas (apps, versions, downloads, guides, stats)
   content/apps/*.md      # "apps" table: base fields (frontmatter) + long description (body)
+  content/versions/<id>/<slug>.md   # "versions" table: parallel editions of an app
   data/
-    downloads.json       # "downloads" table (rows reference app)
+    downloads.json       # "downloads" table (rows reference app, optionally version)
     guides.json          # "guides" table
     stats.json           # "stats" table (static or live-via-CORS)
-  layouts/Base.astro     # theme + global styles
-  components/             # AppCard, DownloadButtons, GuideList, ScreenshotGallery, Stats
+  layouts/Base.astro     # theme + global styles + password gate
+  components/            # AppCard, AppDetail, VersionTabs, DownloadButtons, GuideList, ScreenshotGallery, Stats
   pages/
-    index.astro          # card grid (joins downloads → chips, auto logo)
-    apps/[id].astro      # detail page (joins downloads/guides/stats + auto logo/screenshots)
+    index.astro          # card grid (joins downloads → chips, auto logo, version count)
+    apps/[id].astro      # detail page (default version for versioned apps)
+    apps/[id]/[version].astro  # one page per version
   lib/url.ts             # GitHub Pages base-path helper
-  lib/media.ts           # auto-discovers logo + screenshots from public/apps/<id>/
-public/apps/<id>/        # logo, screenshots, guides (served statically)
-CONTENT.md               # editing surface: the 4 tables in Markdown
+  lib/media.ts           # auto-discovers logo + screenshots from public/apps/<id>/[<slug>/]
+  lib/versions.ts        # version lookup, default version, per-version row filtering
+public/apps/<id>/        # logo, screenshots, guides, <slug>/ version media (served statically)
+tests/                   # data integrity (tests/data) + build output (tests/routes)
+CONTENT.md               # editing surface: the tables in Markdown
 templates/app.template.md
+templates/version.template.md
 .github/workflows/deploy.yml
 ```
 
@@ -102,6 +133,9 @@ templates/app.template.md
 ## Open ends (content)
 
 - **Newsvendor:** add the live web URL as a `web` row in `downloads.json` after the Render deploy.
-- **TNE Case:** build the Windows `.exe` installer and upload to Releases; move the macOS zip to Releases,
-  then point the `downloads.json` rows at the direct asset URLs.
-- Add real in-game screenshots as rows in `screenshots.json` (currently a placeholder).
+- **TNE Case — UZH Edition:** add the live `scp-frontend` Render URL as a `web` row with
+  `"version": "tne-case/uzh"`, then remove `draft: true` from `src/content/versions/tne-case/uzh.md`.
+- **TNE Case — Desktop:** publish the `.zip` builds to GitHub Releases (the build workflow only uploads
+  workflow artifacts), point the `tne-case-desktop-*` rows at the direct asset URLs, and set the
+  version's `status` to `live`.
+- Add real in-game screenshots to `public/apps/<id>/screenshots/` (or `<id>/<slug>/screenshots/`).

@@ -1,0 +1,23 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import AppDetail from '../../../components/AppDetail.astro';
+import { getVersionsByApp, versionSlug } from '../../../lib/versions';
+
+// One page per non-draft version of a non-draft app: /apps/<id>/<slug>.
+export const getStaticPaths = (async () => {
+  const apps = (await getCollection('apps')).filter((app) => !app.data.draft); // hide drafts
+  const versionsByApp = await getVersionsByApp();
+  return apps.flatMap((app) => {
+    const versions = versionsByApp.get(app.id) ?? [];
+    return versions.map((version) => ({
+      params: { id: app.id, version: versionSlug(version) },
+      props: { app, versions, version },
+    }));
+  });
+}) satisfies GetStaticPaths;
+
+const { app, versions, version } = Astro.props;
+---
+
+<AppDetail app={app} versions={versions} version={version} />

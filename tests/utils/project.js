@@ -7,6 +7,9 @@ export const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)
 export const srcDir = path.join(repoRoot, 'src');
 export const dataDir = path.join(srcDir, 'data');
 export const appsContentDir = path.join(srcDir, 'content', 'apps');
+export const versionsContentDir = path.join(srcDir, 'content', 'versions');
+// Version slugs become folders next to these in public/apps/<id>/, so they can't reuse the names.
+export const reservedVersionSlugs = new Set(['guides', 'screenshots']);
 export const publicDir = path.join(repoRoot, 'public');
 export const publicAppsDir = path.join(publicDir, 'apps');
 export const distDir = path.join(repoRoot, 'dist');
@@ -42,6 +45,34 @@ export function readApps() {
         draft: readFrontmatterBoolean(frontmatter, 'draft') ?? false,
       };
     });
+}
+
+// Version manifests: src/content/versions/<appDir>/<slug>.md → id "<appDir>/<slug>".
+export function readVersions() {
+  if (!existsSync(versionsContentDir)) return [];
+
+  return readdirSync(versionsContentDir)
+    .filter((appDir) => statSync(path.join(versionsContentDir, appDir)).isDirectory())
+    .flatMap((appDir) =>
+      readdirSync(path.join(versionsContentDir, appDir))
+        .filter((name) => name.endsWith('.md') && !name.startsWith('_'))
+        .map((name) => {
+          const slug = name.replace(/\.md$/, '');
+          const filePath = path.join(versionsContentDir, appDir, name);
+          const frontmatter = parseFrontmatter(readFileSync(filePath, 'utf8'));
+
+          return {
+            id: `${appDir}/${slug}`,
+            appDir,
+            slug,
+            filePath,
+            app: readFrontmatterString(frontmatter, 'app'),
+            label: readFrontmatterString(frontmatter, 'label'),
+            isDefault: readFrontmatterBoolean(frontmatter, 'default') ?? false,
+            draft: readFrontmatterBoolean(frontmatter, 'draft') ?? false,
+          };
+        })
+    );
 }
 
 export function readBasePath() {

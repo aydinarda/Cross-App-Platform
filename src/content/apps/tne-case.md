@@ -1,25 +1,14 @@
 ---
-title: TNE Case (TGECase)
-tagline: Demand & scenario simulation desktop app
-description: A Streamlit-based, packaged desktop simulation/optimization application.
+title: TNE Case
+tagline: Global supply-chain network design case — cost vs. CO₂
+description: Students design a global supply-chain network across the SC1/SC2 scenarios, balancing total cost against CO₂ emissions.
 category: Simulation / Optimization
-status: live
-draft: true # hidden for now — flip to false (or remove) to publish
+status: live # the card and /apps/tne-case use the default version's status
 order: 2
 accent: '#34d399'
-repo: https://github.com/TNE-CASE/TGE_CASE-web-page
+# repo lives on each version (src/content/versions/tne-case/*.md)
 ---
 
-**TNE Case (TGECase)** — a simulation/optimization desktop app built with Streamlit and packaged
-with PyInstaller as a macOS `.app` and a Windows installer.
-
-### Scenarios
-- **SC1 / SC2** demand-level simulations
-- Optimization module (`optimize/`)
-- Single-page run mode
-
-### Download & install
-The macOS build is compiled for Apple Silicon; after unzipping, run `TNECase.app`. For Windows,
-download the installer `.exe` from the Releases page.
-
-> Large binaries are not kept in the repo; every release is distributed via **GitHub Releases**.
+**TNE Case** is a supply-chain network design case: choose facilities, allocate production and pick
+transport modes to meet global demand at the lowest total cost and CO₂. It comes in parallel
+**editions** — pick one with the tabs above.

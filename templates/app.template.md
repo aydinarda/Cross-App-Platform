@@ -14,7 +14,7 @@ title: App Name
 tagline: One-line pitch
 description: Short description shown on the card.
 category: Game # e.g. Simulation Game / Tool / Optimization
-status: live # live | beta | wip
+status: live # live | beta | wip | down | preparation
 featured: false
 order: 99 # home page order (smaller = first)
 accent: '#5b8cff' # card accent color (optional)

@@ -7,13 +7,17 @@ import { APP_STATUSES, APP_STATUS } from './lib/status';
 // Separate collections; related tables link back to an app via the `app`
 // field (a reference() — a foreign key validated at build time).
 //
-//   apps         src/content/apps/<id>.md   one file per app (base fields + long description body)
-//   downloads    src/data/downloads.json    one row per app+platform
-//   guides       src/data/guides.json       one row per guide/resource
-//   stats        src/data/stats.json        one row per exposed statistic
+//   apps         src/content/apps/<id>.md               one file per app (base fields + long description body)
+//   versions     src/content/versions/<id>/<slug>.md    optional parallel editions of an app (id "<id>/<slug>")
+//   downloads    src/data/downloads.json                one row per app+platform (optionally per version)
+//   guides       src/data/guides.json                   one row per guide/resource (optionally per version)
+//   stats        src/data/stats.json                    one row per exposed statistic (optionally per version)
+//
+// A row without `version` is shared by every version of its app; a row with `version` only shows on
+// that version's page. Apps without version files are unaffected.
 //
 // Images are NOT a collection — logo + screenshots are auto-discovered from
-// public/apps/<id>/ at build time (see src/lib/media.ts).
+// public/apps/<id>/ (and public/apps/<id>/<slug>/ for versions) at build time (see src/lib/media.ts).
 // ---------------------------------------------------------------------------
 
 // "Apps" table — base fields in frontmatter, long description in the markdown body.
@@ -33,14 +37,33 @@ const apps = defineCollection({
   }),
 });
 
+// "Versions" table — parallel editions of one app (e.g. a desktop and a web edition).
+// The entry id is "<app>/<slug>" from the file path; the page is /apps/<app>/<slug>.
+// Don't add a `slug` frontmatter field — it would override the id.
+const versions = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/versions' }),
+  schema: z.object({
+    app: reference('apps'), // FK -> apps.id (must match the folder name)
+    label: z.string(), // tab label, e.g. "UZH Edition"
+    tagline: z.string().optional(), // falls back to the app's
+    description: z.string().optional(), // falls back to the app's
+    status: z.enum(APP_STATUSES).default(APP_STATUS.LIVE),
+    default: z.boolean().default(false), // the version shown at /apps/<app> and on the card
+    order: z.number().default(999), // tab order (smaller = first)
+    repo: z.string().url().optional(), // falls back to the app's
+    draft: z.boolean().default(false), // true = no tab, no page, its rows are hidden
+  }),
+});
+
 // "Downloads" table — each row is one platform target of one app.
 const downloads = defineCollection({
   loader: file('src/data/downloads.json'),
   schema: z.object({
     app: reference('apps'), // FK -> apps.id
+    version: reference('versions').optional(), // FK -> versions.id ("<app>/<slug>"); omit = shared
     platform: z.enum(['web', 'macos', 'windows', 'linux']),
     url: z.string().url(), // web → "Play" link; desktop → .app/.exe/.zip (GitHub Releases)
-    version: z.string().optional(),
+    release: z.string().optional(), // build number shown as "v1.2.0"
     size: z.string().optional(), // e.g. "175 MB"
     note: z.string().optional(), // e.g. "Apple Silicon"
   }),
@@ -51,6 +74,7 @@ const guides = defineCollection({
   loader: file('src/data/guides.json'),
   schema: z.object({
     app: reference('apps'), // FK -> apps.id
+    version: reference('versions').optional(), // FK -> versions.id; omit = shared
     type: z.enum(['admin', 'user', 'build', 'other']).default('other'),
     label: z.string(),
     url: z.string(), // /apps/<id>/guides/...  or an external URL
@@ -65,6 +89,7 @@ const stats = defineCollection({
   loader: file('src/data/stats.json'),
   schema: z.object({
     app: reference('apps'), // FK -> apps.id
+    version: reference('versions').optional(), // FK -> versions.id; omit = shared
     label: z.string(), // e.g. "Players", "Downloads", "Version"
     value: z.union([z.string(), z.number()]).optional(), // shown directly (static) or as fallback (live)
     icon: z.string().optional(), // emoji, e.g. "🎮"
@@ -75,4 +100,4 @@ const stats = defineCollection({
   }),
 });
 
-export const collections = { apps, downloads, guides, stats };
+export const collections = { apps, versions, downloads, guides, stats };

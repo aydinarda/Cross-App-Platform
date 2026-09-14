@@ -1,0 +1,58 @@
+---
+import { withBase } from '../lib/url';
+import { versionSlug, type Version } from '../lib/versions';
+
+interface Props {
+  appId: string;
+  versions: Version[]; // visible versions of the app, sorted by order
+  current?: Version; // the version shown on this page
+}
+
+const { appId, versions, current } = Astro.props;
+---
+
+{
+  versions.length > 1 && (
+    <nav class="version-tabs" aria-label="Versions">
+      {versions.map((v) => (
+        <a
+          class="tab"
+          href={withBase(`/apps/${appId}/${versionSlug(v)}`)}
+          aria-current={v.id === current?.id ? 'page' : undefined}
+        >
+          {v.data.label}
+        </a>
+      ))}
+    </nav>
+  )
+}
+
+<style>
+  .version-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: -0.8rem 0 1.6rem;
+  }
+  .tab {
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .tab:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  .tab[aria-current='page'] {
+    color: var(--text);
+    border-color: var(--accent);
+    background: var(--card);
+  }
+</style>

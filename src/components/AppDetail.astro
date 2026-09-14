@@ -1,0 +1,292 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import DownloadButtons from './DownloadButtons.astro';
+import GuideList from './GuideList.astro';
+import ScreenshotGallery from './ScreenshotGallery.astro';
+import Stats from './Stats.astro';
+import VersionTabs from './VersionTabs.astro';
+import { withBase } from '../lib/url';
+import { getLogo, getScreenshots } from '../lib/media';
+import { rowsFor, versionSlug, type Version } from '../lib/versions';
+import statsData from '../data/stats.json';
+
+interface Props {
+  app: CollectionEntry<'apps'>;
+  versions: Version[]; // visible versions of the app (empty for single-version apps)
+  version?: Version; // the version shown on this page
+}
+
+const { app, versions, version } = Astro.props;
+const { data } = app;
+const slug = version && versionSlug(version);
+
+// Version fields override the app's base fields.
+const status = version?.data.status ?? data.status;
+const tagline = version?.data.tagline ?? data.tagline;
+const description = version?.data.description ?? data.description;
+const repo = version?.data.repo ?? data.repo;
+
+// App body = shared overview; version body = version-specific long description.
+const { Content } = await render(app);
+const VersionContent = version ? (await render(version)).Content : undefined;
+
+// Join the related tables to this app (and version) via the `app` / `version` references.
+const downloads = rowsFor(
+  (await getCollection('downloads')).map((d) => d.data),
+  app.id,
+  version?.id
+);
+const guides = rowsFor(
+  (await getCollection('guides')).map((g) => g.data),
+  app.id,
+  version?.id
+);
+// Skip getCollection('stats') while stats.json is empty — Astro warns on an empty collection.
+const stats =
+  statsData.length === 0
+    ? []
+    : rowsFor(
+        (await getCollection('stats')).map((s) => s.data),
+        app.id,
+        version?.id
+      );
+
+// Logo + screenshots are auto-discovered from public/apps/<id>/[<slug>/] (no JSON to maintain).
+const logo = getLogo(app.id, slug);
+const screenshots = getScreenshots(app.id, slug).map((s) => s.file);
+
+// The web "Play" link is the header CTA; desktop installers go in the Download section.
+const webUrl = downloads.find((d) => d.platform === 'web')?.url;
+const desktopDownloads = downloads.filter((d) => d.platform !== 'web');
+const hasGuides = guides.length > 0 || !!repo;
+const pageTitle = version ? `${data.title} (${version.data.label})` : data.title;
+---
+
+<Base title={`${pageTitle} — App Hub`} description={tagline ?? description}>
+  <a class="back" href={withBase('/')}>← All apps</a>
+
+  <header class="app-head">
+    {
+      logo ? (
+        <img class="head-logo" src={withBase(logo)} alt={`${data.title} logo`} />
+      ) : (
+        <div class="head-logo head-logo--ph">{data.title.charAt(0)}</div>
+      )
+    }
+    <div class="head-text">
+      <div class="head-row">
+        <h1>{data.title}</h1>
+        <span class={`badge badge-${status}`}>{status}</span>
+      </div>
+      {tagline && <p class="head-tag">{tagline}</p>}
+    </div>
+    {
+      webUrl && (
+        <a class="btn btn-primary head-play" href={webUrl} target="_blank" rel="noopener">
+          ▶ Play
+        </a>
+      )
+    }
+  </header>
+
+  <VersionTabs appId={app.id} versions={versions} current={version} />
+
+  {
+    desktopDownloads.length > 0 && (
+      <section class="block">
+        <h2>Download</h2>
+        <DownloadButtons downloads={desktopDownloads} />
+      </section>
+    )
+  }
+
+  {
+    stats.length > 0 && (
+      <section class="block">
+        <h2>Stats</h2>
+        <Stats stats={stats} />
+      </section>
+    )
+  }
+
+  <section class="block prose">
+    <Content />
+    {VersionContent && <VersionContent />}
+  </section>
+
+  {
+    screenshots.length > 0 && (
+      <section class="block">
+        <h2>Screenshots</h2>
+        <ScreenshotGallery screenshots={screenshots} title={data.title} />
+      </section>
+    )
+  }
+
+  {
+    hasGuides && (
+      <section class="block">
+        <h2>Guides &amp; Resources</h2>
+        <GuideList guides={guides} repo={repo} />
+      </section>
+    )
+  }
+
+  <script>
+    // Turn each long-description (.prose) h3 into a collapsible accordion section:
+    // click (or Enter/Space) the heading to toggle the content beneath it.
+    document.querySelectorAll('.prose h3').forEach((h) => {
+      const heading = h as HTMLElement;
+      const body = document.createElement('div');
+      body.className = 'collapse-body';
+      // Move every sibling up to the next h2/h3 into the collapsible body.
+      let el = heading.nextElementSibling;
+      while (el && el.tagName !== 'H3' && el.tagName !== 'H2') {
+        const next = el.nextElementSibling;
+        body.appendChild(el);
+        el = next;
+      }
+      heading.after(body);
+      heading.classList.add('collapsible');
+      heading.setAttribute('role', 'button');
+      heading.setAttribute('tabindex', '0');
+      heading.setAttribute('aria-expanded', 'false');
+      body.hidden = true; // default collapsed
+
+      const toggle = () => {
+        const wasHidden = body.hidden;
+        body.hidden = !wasHidden;
+        heading.setAttribute('aria-expanded', String(wasHidden));
+      };
+      heading.addEventListener('click', toggle);
+      heading.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle();
+        }
+      });
+    });
+  </script>
+</Base>
+
+<style>
+  .back {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+  .back:hover {
+    color: var(--text);
+  }
+
+  .app-head {
+    display: flex;
+    gap: 1.1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 1.2rem 0 2rem;
+  }
+  .head-text {
+    flex: 1 1 240px;
+  }
+  .head-logo {
+    width: 84px;
+    height: 84px;
+    border-radius: 18px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    flex-shrink: 0;
+  }
+  .head-logo--ph {
+    display: grid;
+    place-items: center;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .head-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+  }
+  .head-row h1 {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  .head-tag {
+    margin: 0.3rem 0 0;
+    color: var(--text);
+  }
+  .head-play {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 1rem;
+    padding: 0.7rem 1.4rem;
+    white-space: nowrap;
+  }
+  @media (max-width: 540px) {
+    .head-play {
+      margin-left: 0;
+    }
+  }
+
+  .block {
+    margin: 2rem 0;
+  }
+  .block h2 {
+    font-size: 1.1rem;
+    margin: 0 0 0.9rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .prose :global(p) {
+    color: var(--text-dim);
+  }
+  .prose :global(h2),
+  .prose :global(h3) {
+    color: var(--text);
+    border: none;
+  }
+  .prose :global(ul) {
+    color: var(--text-dim);
+  }
+  .prose :global(a) {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  .prose :global(code) {
+    background: var(--bg-soft);
+    padding: 0.1rem 0.35rem;
+    border-radius: 5px;
+    font-size: 0.88em;
+  }
+
+  /* Collapsible h3 sections (toggled by the script above) */
+  .prose :global(h3.collapsible) {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.15s ease;
+  }
+  .prose :global(h3.collapsible:hover) {
+    color: var(--accent);
+  }
+  .prose :global(h3.collapsible)::before {
+    content: '▸';
+    font-size: 0.75em;
+    color: var(--accent);
+    display: inline-block;
+    transition: transform 0.15s ease;
+  }
+  .prose :global(h3.collapsible[aria-expanded='true'])::before {
+    transform: rotate(90deg);
+  }
+  .prose :global(.collapse-body[hidden]) {
+    display: none;
+  }
+</style>
