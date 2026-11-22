@@ -2,11 +2,10 @@
 app: tne-case
 label: UZH Edition
 tagline: Web-native multiplayer puzzle with class rooms and a live leaderboard
-status: live
+status: live # approved by you on 2026-11-22
 default: true
 order: 1
 repo: https://github.com/TNE-CASE/TNEv2-web
-draft: true # hidden until the live Render URL is added to downloads.json as "tne-case-uzh-web"
 ---
 
 The **UZH Edition** (Supply-Chain Puzzle) is a web-native, multiplayer version of the TNE Case.

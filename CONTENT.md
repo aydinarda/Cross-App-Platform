@@ -219,7 +219,7 @@ Demand during the wait can turn into lost sales, so every order trades off servi
 
 | id | app | label | tagline | status | default | order | repo | draft |
 |----|-----|-------|---------|--------|---------|-------|------|-------|
-| tne-case/uzh | tne-case | UZH Edition | Web-native multiplayer puzzle with class rooms and a live leaderboard | live | true | 1 | https://github.com/TNE-CASE/TNEv2-web | true _(until the live URL is added)_ |
+| tne-case/uzh | tne-case | UZH Edition | Web-native multiplayer puzzle with class rooms and a live leaderboard | live | true | 1 | https://github.com/TNE-CASE/TNEv2-web | false |
 | tne-case/desktop | tne-case | Desktop | Streamlit + Gurobi optimization suite, packaged as a desktop app | preparation | false | 2 | https://github.com/TNE-CASE/TGE_CASE-web-page | false |
 
 **Version long descriptions** (shown below the app's shared overview):
@@ -282,7 +282,7 @@ Builds are distributed as `.zip` files for macOS (Apple Silicon) and Windows. Af
 | app | version | platform | url | size | note | release |
 |-----|---------|----------|-----|------|------|---------|
 | newsvendor | | web | `<<FILL: live Render URL, e.g. https://newsvendor.onrender.com>>` | | | |
-| tne-case | tne-case/uzh | web | `<<FILL: live scp-frontend Render URL>>` | | | |
+| tne-case | tne-case/uzh | web | https://scp-frontend-mrzy.onrender.com/ | | The host creates the room on the same page | |
 | tne-case | tne-case/desktop | macos | `<<FILL: Releases .zip link>>` | 175 MB | Apple Silicon (.zip) | |
 | tne-case | tne-case/desktop | windows | `<<FILL: Releases .zip link>>` | 200 MB | Windows (.zip) | |
 | arya-phones | | web | https://aryaphonesupp.onrender.com | | Temporarily offline — hosted instance is currently down | |
@@ -301,9 +301,10 @@ Builds are distributed as `.zip` files for macOS (Apple Silicon) and Windows. Af
 | app | version | type | label | url |
 |-----|---------|------|-------|-----|
 | newsvendor | | admin | Admin Guide (.docx) | /apps/newsvendor/guides/admin-guide.docx |
-| newsvendor | | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
+| newsvendor | | user | User Guide (.docx) | /apps/newsvendor/guides/user-guide.docx |
+| tne-case | tne-case/uzh | admin | Admin Guide (.docx) | /apps/tne-case/guides/admin-guide.docx |
+| tne-case | tne-case/uzh | user | User Guide (.docx) | /apps/tne-case/guides/user-guide.docx |
 | tne-case | tne-case/desktop | build | Build Guide (README_BUILD) | https://github.com/TNE-CASE/TGE_CASE-web-page/blob/main/README_BUILD.md |
-| tne-case | `<<FILL: tne-case/uzh or tne-case/desktop>>` | user | `<<FILL: is there a User Guide?>>` | `<<FILL>>` |
 | arya-phones | | admin | Admin Guide (.pdf) | /apps/arya-phones/guides/admin-guide.pdf |
 | order-up-to | | admin | Admin Guide (.pdf) | /apps/order-up-to/guides/admin-guide.pdf |
 | cap-and-trade | | admin | Admin Guide (.docx) | /apps/cap-and-trade/guides/admin-guide.docx |

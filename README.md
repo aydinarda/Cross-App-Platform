@@ -133,8 +133,6 @@ templates/version.template.md
 ## Open ends (content)
 
 - **Newsvendor:** add the live web URL as a `web` row in `downloads.json` after the Render deploy.
-- **TNE Case — UZH Edition:** add the live `scp-frontend` Render URL as a `web` row with
-  `"version": "tne-case/uzh"`, then remove `draft: true` from `src/content/versions/tne-case/uzh.md`.
 - **TNE Case — Desktop:** publish the `.zip` builds to GitHub Releases (the build workflow only uploads
   workflow artifacts), point the `tne-case-desktop-*` rows at the direct asset URLs, and set the
   version's `status` to `live`.

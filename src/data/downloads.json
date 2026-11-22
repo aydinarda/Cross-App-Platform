@@ -1,5 +1,13 @@
 [
   {
+    "id": "tne-case-uzh-web",
+    "app": "tne-case",
+    "version": "tne-case/uzh",
+    "platform": "web",
+    "url": "https://scp-frontend-mrzy.onrender.com/",
+    "note": "The host creates the room on the same page"
+  },
+  {
     "id": "tne-case-desktop-macos",
     "app": "tne-case",
     "version": "tne-case/desktop",

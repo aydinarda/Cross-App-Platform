@@ -7,6 +7,30 @@
     "url": "/apps/newsvendor/guides/admin-guide.docx"
   },
   {
+    "id": "newsvendor-user",
+    "app": "newsvendor",
+    "type": "user",
+    "label": "User Guide (.docx)",
+    "url": "/apps/newsvendor/guides/user-guide.docx"
+  },
+
+  {
+    "id": "tne-case-uzh-admin",
+    "app": "tne-case",
+    "version": "tne-case/uzh",
+    "type": "admin",
+    "label": "Admin Guide (.docx)",
+    "url": "/apps/tne-case/guides/admin-guide.docx"
+  },
+  {
+    "id": "tne-case-uzh-user",
+    "app": "tne-case",
+    "version": "tne-case/uzh",
+    "type": "user",
+    "label": "User Guide (.docx)",
+    "url": "/apps/tne-case/guides/user-guide.docx"
+  },
+  {
     "id": "tne-case-build",
     "app": "tne-case",
     "version": "tne-case/desktop",
@@ -14,6 +38,7 @@
     "label": "Build Guide (README_BUILD)",
     "url": "https://github.com/TNE-CASE/TGE_CASE-web-page/blob/main/README_BUILD.md"
   },
+
   {
     "id": "arya-phones-admin",
     "app": "arya-phones",
@@ -34,6 +59,19 @@
     "type": "admin",
     "label": "Admin Guide (.docx)",
     "url": "/apps/cap-and-trade/guides/admin-guide.docx"
+  },
+  {
+    "id": "risk-pooling-user",
+    "app": "risk-pooling",
+    "type": "user",
+    "label": "User Guide (PDF)",
+    "url": "/apps/risk-pooling/guides/user-guide.pdf"
+  },
+  {
+    "id": "risk-pooling-admin",
+    "app": "risk-pooling",
+    "type": "admin",
+    "label": "Admin Guide (PDF)",
+    "url": "/apps/risk-pooling/guides/admin-guide.pdf"
   }
-
 ]
