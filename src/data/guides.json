@@ -73,5 +73,12 @@
     "type": "admin",
     "label": "Admin Guide (PDF)",
     "url": "/apps/risk-pooling/guides/admin-guide.pdf"
+  },
+  {
+    "id": "cap-and-trade-user",
+    "app": "cap-and-trade",
+    "type": "user",
+    "label": "User Guide (PDF)",
+    "url": "/apps/cap-and-trade/guides/user-guide.pdf"
   }
 ]
